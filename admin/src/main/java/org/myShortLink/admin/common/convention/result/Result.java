@@ -1,4 +1,4 @@
-package org.myShortLink.admin.common.convention;
+package org.myShortLink.admin.common.convention.result;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -10,6 +10,7 @@ import java.io.Serializable;
 public class Result<T> implements Serializable {
 
     public static final String SUCCESS_CODE = "0";
+
     private String code;
     private  String message;
     private T data;
