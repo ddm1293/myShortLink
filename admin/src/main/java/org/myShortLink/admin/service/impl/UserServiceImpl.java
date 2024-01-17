@@ -16,9 +16,10 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {
 
     @Override
-    public UserRespDTO getUserByUserName(String username) {
+    public UserRespDTO getUserByUsername(String username) {
         LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
-                .eq(UserDO::getUsername, username);
+                .eq(UserDO::getUsername, username)
+                .eq(UserDO::getArchived, 0);
         UserDO userDO = baseMapper.selectOne(queryWrapper);
         if (userDO == null) {
             throw new ClientException(BaseErrorCode.USER_NULL_ERROR);
@@ -26,5 +27,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         UserRespDTO res = new UserRespDTO();
         BeanUtils.copyProperties(userDO, res);
         return res;
+    }
+
+    @Override
+    public Boolean hasUsernameRegistered(String username) {
+        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
+                .eq(UserDO::getUsername, username)
+                .eq(UserDO::getArchived, 0);
+        UserDO userDO = baseMapper.selectOne(queryWrapper);
+        return userDO != null;
     }
 }

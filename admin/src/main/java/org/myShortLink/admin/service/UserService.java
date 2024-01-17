@@ -6,5 +6,7 @@ import org.myShortLink.admin.dto.resp.UserRespDTO;
 
 public interface UserService extends IService<UserDO> {
 
-        UserRespDTO getUserByUserName(String username);
+        UserRespDTO getUserByUsername(String username);
+
+        Boolean hasUsernameRegistered(String username);
 }
