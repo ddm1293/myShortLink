@@ -2,6 +2,8 @@ package org.myShortLink.admin.dao.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -23,18 +25,16 @@ public class User {
     @Column(length = 512, unique = true)
     private String email;
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT '0'")
-    private int archived;
+    @Column(nullable = false)
+    private boolean archived;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT NULL")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime archivedAt;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 }

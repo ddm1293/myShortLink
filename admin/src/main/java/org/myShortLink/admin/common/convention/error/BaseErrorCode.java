@@ -11,9 +11,9 @@ public enum BaseErrorCode implements IErrorCode {
     USER_NAME_EXIST_ERROR("A000111", "Username Already Exists"),
     USER_NAME_SENSITIVE_ERROR("A000112", "Username Contains Sensitive Words"),
     USER_NAME_SPECIAL_CHARACTER_ERROR("A000113", "Username Contains Special Characters"),
+    USER_SAVE_ERROR("A000114", "Error Saving User"),
     PASSWORD_VERIFY_ERROR("A000120", "Password Verification Failed"),
     PASSWORD_SHORT_ERROR("A000121", "Password Length Insufficient"),
-    PHONE_VERIFY_ERROR("A000151", "Phone Format Verification Failed"),
 
     //  Tier-Two Errors: System Requests Missing Idempotent Token
     IDEMPOTENT_TOKEN_NULL_ERROR("A000200", "Idempotent Token is Null"),
