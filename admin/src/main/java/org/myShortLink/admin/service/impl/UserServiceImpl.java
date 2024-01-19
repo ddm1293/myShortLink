@@ -25,7 +25,6 @@ public class UserServiceImpl implements UserService {
         if (studentByUsername.isEmpty()) {
             throw new ClientException(BaseErrorCode.USER_NULL_ERROR);
         }
-        log.debug("Fetched studentByUsername: {}", studentByUsername.get());
         UserRespDTO res = new UserRespDTO();
         BeanUtils.copyProperties(studentByUsername.get(), res);
         return res;
