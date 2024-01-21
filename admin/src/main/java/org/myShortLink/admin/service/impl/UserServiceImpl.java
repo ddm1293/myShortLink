@@ -16,7 +16,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.myShortLink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
@@ -33,12 +32,10 @@ public class UserServiceImpl implements UserService {
     private final RedissonClient redissonClient;
 
     public UserRespDTO getUserByUsername(String username) {
-        Optional<User> studentByUsername = userRepository.findByUsername(username);
-        if (studentByUsername.isEmpty()) {
-            throw new ClientException(BaseErrorCode.USER_NULL_ERROR);
-        }
+        User studentByUsername = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ClientException(BaseErrorCode.USER_NULL_ERROR));
         UserRespDTO res = new UserRespDTO();
-        BeanUtils.copyProperties(studentByUsername.get(), res);
+        BeanUtils.copyProperties(studentByUsername, res);
         return res;
     }
 
