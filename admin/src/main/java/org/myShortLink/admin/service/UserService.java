@@ -1,7 +1,9 @@
 package org.myShortLink.admin.service;
 
+import org.myShortLink.admin.dto.req.UserLoginReqDTO;
 import org.myShortLink.admin.dto.req.UserRegisterReqDTO;
 import org.myShortLink.admin.dto.req.UserUpdateReqDTO;
+import org.myShortLink.admin.dto.resp.UserLoginRespDTO;
 import org.myShortLink.admin.dto.resp.UserRespDTO;
 
 public interface UserService {
@@ -15,4 +17,6 @@ public interface UserService {
         void register(UserRegisterReqDTO reqBody);
 
         void update(UserUpdateReqDTO reqBody);
+
+        UserLoginRespDTO login(UserLoginReqDTO reqBody);
 }
