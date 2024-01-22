@@ -9,8 +9,15 @@ import org.springframework.context.annotation.Configuration;
 public class RBloomFilterConfiguration {
 
     @Bean
-    public RBloomFilter<String> userRegisterCachePenetrationBloomFilter(RedissonClient redissonClient) {
-        RBloomFilter<String> cachePenetrationBloomFilter = redissonClient.getBloomFilter("userRegisterCachePenetrationBloomFilter");
+    public RBloomFilter<String> usernameBloomFilter(RedissonClient redissonClient) {
+        RBloomFilter<String> cachePenetrationBloomFilter = redissonClient.getBloomFilter("usernameBloomFilter");
+        cachePenetrationBloomFilter.tryInit(1000000L, 0.0001);
+        return cachePenetrationBloomFilter;
+    }
+
+    @Bean
+    public RBloomFilter<String> userEmailBloomFilter(RedissonClient redissonClient) {
+        RBloomFilter<String> cachePenetrationBloomFilter = redissonClient.getBloomFilter("userEmailBloomFilter");
         cachePenetrationBloomFilter.tryInit(1000000L, 0.0001);
         return cachePenetrationBloomFilter;
     }

@@ -13,7 +13,8 @@ public enum BaseErrorCode implements IErrorCode {
     USER_NAME_SPECIAL_CHARACTER_ERROR("A000113", "Username Contains Special Characters"),
     USER_SAVE_ERROR("A000114", "Error Saving User"),
     USER_REGISTRATION_BUSY("A000115", "Multiple User Registration, Busy"),
-    USER_REGISTRATION_INTERRUPTED("A000115", "User Registration Interrupted"),
+    USER_REGISTRATION_INTERRUPTED("A000116", "User Registration Interrupted"),
+    USER_EMAIL_EXIST_ERROR("A000117", "Username Email Exists"),
     PASSWORD_VERIFY_ERROR("A000120", "Password Verification Failed"),
     PASSWORD_SHORT_ERROR("A000121", "Password Length Insufficient"),
 
