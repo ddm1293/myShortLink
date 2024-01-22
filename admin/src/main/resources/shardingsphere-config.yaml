@@ -36,5 +36,21 @@ rules:
         props:
           worker-id: 1
 
+  - !ENCRYPT
+    tables:
+      t_user:
+        columns:
+          password:
+            cipherColumn: password
+            encryptorName: common_encryptor
+        # 是否按照密文字段查询
+        queryWithCipherColumn: true
+
+    encryptors:
+      common_encryptor:
+        type: AES
+        props:
+          aes-key-value: ${ENCRYPTION_KEY}
+
 props:
   sql-show: true
