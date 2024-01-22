@@ -3,6 +3,7 @@ package org.myShortLink.admin.dao.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,12 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            generator = "snowflakeIdGenerator")
+    @GenericGenerator(
+            name = "snowflakeIdGenerator",
+            strategy = "org.myShortLink.admin.config.SnowflakeIdGenerator"
+    )
     private Long id;
 
     @Column(length = 256, nullable = false, unique = true)
