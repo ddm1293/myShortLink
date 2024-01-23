@@ -32,6 +32,11 @@ public class UserController {
         return Results.success(userService.hasEmailRegistered(email));
     }
 
+    @GetMapping("/user/checkPhoneNumberExistence")
+    public Result<Boolean> checkUserPhoneNumberExistence(@RequestParam("phoneNumber") String phoneNumber) {
+        return Results.success(userService.hasPhoneNumberRegistered(phoneNumber));
+    }
+
     @PostMapping("/user")
     public Result<Void> register(@RequestBody UserRegisterReqDTO reqBody) {
         userService.register(reqBody);

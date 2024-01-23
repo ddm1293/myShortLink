@@ -14,6 +14,8 @@ public interface UserService {
 
         Boolean hasEmailRegistered(String email);
 
+        Boolean hasPhoneNumberRegistered(String phoneNumber);
+
         void register(UserRegisterReqDTO reqBody);
 
         void update(UserUpdateReqDTO reqBody);

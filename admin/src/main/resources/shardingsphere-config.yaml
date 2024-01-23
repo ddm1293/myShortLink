@@ -40,10 +40,9 @@ rules:
     tables:
       t_user:
         columns:
-          password:
-            cipherColumn: password
+          phone_number:
+            cipherColumn: phone_number
             encryptorName: common_encryptor
-        # 是否按照密文字段查询
         queryWithCipherColumn: true
 
     encryptors:

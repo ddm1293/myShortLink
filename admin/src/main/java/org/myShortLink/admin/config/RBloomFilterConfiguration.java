@@ -21,4 +21,11 @@ public class RBloomFilterConfiguration {
         cachePenetrationBloomFilter.tryInit(1000000L, 0.0001);
         return cachePenetrationBloomFilter;
     }
+
+    @Bean
+    public RBloomFilter<String> userPhoneNumberBloomFilter(RedissonClient redissonClient) {
+        RBloomFilter<String> cachePenetrationBloomFilter = redissonClient.getBloomFilter("userPhoneNumberBloomFilter");
+        cachePenetrationBloomFilter.tryInit(1000000L, 0.0001);
+        return cachePenetrationBloomFilter;
+    }
 }

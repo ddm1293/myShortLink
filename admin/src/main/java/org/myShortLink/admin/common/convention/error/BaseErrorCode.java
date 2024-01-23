@@ -15,6 +15,7 @@ public enum BaseErrorCode implements IErrorCode {
     USER_REGISTRATION_BUSY("A000115", "Multiple User Registration, Busy"),
     USER_REGISTRATION_INTERRUPTED("A000116", "User Registration Interrupted"),
     USER_EMAIL_EXIST_ERROR("A000117", "Username Email Exists"),
+    USER_PHONE_NUMBER_EXIST_ERROR("A000118", "Username Phone Number Exists"),
     PASSWORD_VERIFY_ERROR("A000120", "Password Verification Failed"),
     PASSWORD_SHORT_ERROR("A000121", "Password Length Insufficient"),
 

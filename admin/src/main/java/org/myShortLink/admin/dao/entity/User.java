@@ -31,6 +31,9 @@ public class User {
     @Column(length = 512, unique = true)
     private String email;
 
+    @Column(length = 100, unique = true)
+    private String phoneNumber;
+
     @Column(nullable = false)
     private boolean archived;
 

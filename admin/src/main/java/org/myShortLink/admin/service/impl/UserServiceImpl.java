@@ -33,6 +33,8 @@ public class UserServiceImpl implements UserService {
 
     private final RBloomFilter<String> userEmailBloomFilter;
 
+    private final RBloomFilter<String> userPhoneNumberBloomFilter;
+
     private final UserRepository userRepository;
 
     private final RedissonClient redissonClient;
@@ -56,6 +58,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Boolean hasPhoneNumberRegistered(String phoneNumber) {
+        return userPhoneNumberBloomFilter.contains(phoneNumber);
+    }
+
+    @Override
     @Transactional
     public void register(UserRegisterReqDTO reqBody) {
         if (hasUsernameRegistered(reqBody.getUsername())) {
@@ -66,6 +73,10 @@ public class UserServiceImpl implements UserService {
             throw new ClientException(BaseErrorCode.USER_EMAIL_EXIST_ERROR);
         }
 
+        if (hasPhoneNumberRegistered(reqBody.getPhoneNumber())) {
+            throw new ClientException(BaseErrorCode.USER_PHONE_NUMBER_EXIST_ERROR);
+        }
+
         RLock lock = redissonClient.getLock(LOCK_USER_REGISTER_KEY + reqBody.getUsername());
 
         try {
@@ -74,6 +85,7 @@ public class UserServiceImpl implements UserService {
                     userRepository.save(BeanUtil.toBean(reqBody, User.class));
                     usernameBloomFilter.add(reqBody.getUsername());
                     userEmailBloomFilter.add(reqBody.getEmail());
+                    userPhoneNumberBloomFilter.add(reqBody.getPhoneNumber());
                 } finally {
                     if (lock.isHeldByCurrentThread()) {
                         lock.unlock();
@@ -95,13 +107,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void update(UserUpdateReqDTO reqBody) {
         User user = fetchUserByUsername(reqBody.getUsername());
-        if (!hasEmailRegistered(reqBody.getEmail())) {
-            user.setEmail(reqBody.getEmail());
-            user.setPassword(reqBody.getPassword());
-            userRepository.save(user);
-        } else {
-            throw new ClientException(BaseErrorCode.USER_EMAIL_EXIST_ERROR);
-        }
+        user.setEmail(reqBody.getEmail());
+        user.setPassword(reqBody.getPassword());
+        user.setPhoneNumber(reqBody.getPhoneNumber());
+        userRepository.save(user);
     }
 
     private User fetchUserByUsername(String username) {
