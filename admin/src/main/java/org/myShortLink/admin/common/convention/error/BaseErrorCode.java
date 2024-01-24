@@ -18,6 +18,8 @@ public enum BaseErrorCode implements IErrorCode {
     USER_PHONE_NUMBER_EXIST_ERROR("A000118", "Username Phone Number Exists"),
     PASSWORD_VERIFY_ERROR("A000120", "Password Verification Failed"),
     PASSWORD_SHORT_ERROR("A000121", "Password Length Insufficient"),
+    USER_JSON_PARSE_ERROR("A000122", "Cannot Parse User JSON"),
+    PASSWORD_MISMATCH_ERROR("A000123", "Password Mismatch"),
 
     //  Tier-Two Errors: System Requests Missing Idempotent Token
     IDEMPOTENT_TOKEN_NULL_ERROR("A000200", "Idempotent Token is Null"),

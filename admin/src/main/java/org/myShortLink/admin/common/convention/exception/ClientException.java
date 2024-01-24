@@ -6,7 +6,7 @@ import org.myShortLink.admin.common.convention.error.IErrorCode;
 public class ClientException extends AbstractException {
 
     public ClientException(IErrorCode errorCode) {
-        this(null, null, errorCode);
+        this(errorCode.message(), null, errorCode);
     }
 
     public ClientException(String message) {

@@ -49,6 +49,7 @@ public class UserController {
         return Results.success();
     }
 
+    @PostMapping("/user/login")
     public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO reqBody) {
         return Results.success(userService.login(reqBody));
     }

@@ -1,6 +1,9 @@
 package org.myShortLink.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.admin.common.convention.error.BaseErrorCode;
@@ -17,10 +20,12 @@ import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.myShortLink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
@@ -41,6 +46,8 @@ public class UserServiceImpl implements UserService {
     private final RedissonClient redissonClient;
 
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     public UserRespDTO getUserByUsername(String username) {
@@ -125,6 +132,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserLoginRespDTO login(UserLoginReqDTO reqBody) {
-        return null;
+        User matchedUser = fetchUserByUsername(reqBody.getUsername());
+
+        if (!passwordEncoder.matches(reqBody.getPassword(), matchedUser.getPassword())) {
+            throw new ClientException(BaseErrorCode.PASSWORD_MISMATCH_ERROR);
+        }
+
+        String uuid = UUID.randomUUID().toString();
+        ObjectMapper om = new ObjectMapper().registerModule(new JavaTimeModule());
+        try {
+            String userJson = om.writeValueAsString(matchedUser);
+            stringRedisTemplate.opsForValue().set(uuid, userJson, 30L, TimeUnit.MINUTES);
+        } catch (JsonProcessingException e) {
+            log.error("Error Parsing User:", e);
+            throw new ClientException(BaseErrorCode.USER_JSON_PARSE_ERROR);
+        }
+        return new UserLoginRespDTO(uuid);
     }
 }

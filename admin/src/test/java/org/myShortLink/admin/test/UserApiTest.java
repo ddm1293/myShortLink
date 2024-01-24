@@ -32,7 +32,7 @@ public class UserApiTest {
     @Test
     void testGetUserByUsername() throws Exception {
         String username = "ddm1293";
-        UserRespDTO userRespDTO = new UserRespDTO(123L, username, "ddm1293@gmail.com");
+        UserRespDTO userRespDTO = new UserRespDTO(123L, username, "ddm1293@gmail.com", "7781237891");
 
         Mockito.when(userService.getUserByUsername(username))
                 .thenReturn(userRespDTO);
