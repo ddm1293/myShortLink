@@ -118,6 +118,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void update(UserUpdateReqDTO reqBody) {
+        // TODO check user is logged in to proceed updating
         User user = fetchUserByUsername(reqBody.getUsername());
         user.setEmail(reqBody.getEmail());
         user.setPassword(reqBody.getPassword());
