@@ -17,6 +17,7 @@ import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private final RedissonClient redissonClient;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public UserRespDTO getUserByUsername(String username) {
@@ -82,6 +85,8 @@ public class UserServiceImpl implements UserService {
         try {
             if (lock.tryLock(10, TimeUnit.SECONDS)) {
                 try {
+                    String encodedPassword = passwordEncoder.encode(reqBody.getPassword());
+                    reqBody.setPassword(encodedPassword);
                     userRepository.save(BeanUtil.toBean(reqBody, User.class));
                     usernameBloomFilter.add(reqBody.getUsername());
                     userEmailBloomFilter.add(reqBody.getEmail());

@@ -31,7 +31,7 @@
         <guava.version>30.0-jre</guava.version>
         <spring-boot-jpa.version>3.2.1</spring-boot-jpa.version>
         <spring-boot-starter-test.version>3.2.1</spring-boot-starter-test.version>
-        <spring-boot-starter-security.version>6.2.1</spring-boot-starter-security.version>
+        <spring-boot-starter-security.version>3.1.2</spring-boot-starter-security.version>
     </properties>
 
     <dependencies>

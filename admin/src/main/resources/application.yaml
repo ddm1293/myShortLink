@@ -4,6 +4,12 @@ server:
     include-message: always
 
 spring:
+  security:
+    user:
+      name: admin
+      password: password
+    basic:
+      enabled: true
   data:
     redis:
       host: 127.0.0.1
@@ -16,7 +22,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     show-sql: true
 
 logging:
