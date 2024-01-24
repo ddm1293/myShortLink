@@ -134,6 +134,10 @@ public class UserServiceImpl implements UserService {
     public UserLoginRespDTO login(UserLoginReqDTO reqBody) {
         User matchedUser = fetchUserByUsername(reqBody.getUsername());
 
+        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey("login_" + reqBody.getUsername()))) {
+            throw new ClientException(BaseErrorCode.USER_ALREADY_LOGGED_IN_ERROR);
+        }
+
         if (!passwordEncoder.matches(reqBody.getPassword(), matchedUser.getPassword())) {
             throw new ClientException(BaseErrorCode.PASSWORD_MISMATCH_ERROR);
         }
@@ -142,11 +146,25 @@ public class UserServiceImpl implements UserService {
         ObjectMapper om = new ObjectMapper().registerModule(new JavaTimeModule());
         try {
             String userJson = om.writeValueAsString(matchedUser);
-            stringRedisTemplate.opsForValue().set(uuid, userJson, 30L, TimeUnit.MINUTES);
+            stringRedisTemplate.opsForHash().put("login_" + reqBody.getUsername(), uuid, userJson);
+            stringRedisTemplate.expire("login_" + reqBody.getUsername(), 30L, TimeUnit.MINUTES);
         } catch (JsonProcessingException e) {
             log.error("Error Parsing User:", e);
             throw new ClientException(BaseErrorCode.USER_JSON_PARSE_ERROR);
         }
         return new UserLoginRespDTO(uuid);
+    }
+
+    @Override
+    public Boolean checkLogin(String username, String token) {
+        return stringRedisTemplate.opsForHash().get("login_" + username, token) != null;
+    }
+
+    @Override
+    public void logout(String username, String token) {
+        if (!checkLogin(username, token)) {
+            throw new ClientException(BaseErrorCode.USER_NOT_LOGGED_IN_ERROR);
+        }
+        stringRedisTemplate.delete("login_" + username);
     }
 }
