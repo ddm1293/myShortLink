@@ -1,38 +1,46 @@
 package org.myShortLink.admin.dao.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "t_user")
 @Data
-public class User {
+@Entity
+@Table(name ="t_group")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Group {
 
     @Id
     @GeneratedValue(
-            generator = "snowflakeIdGenerator")
+            generator = "snowflakeIdGenerator"
+    )
     @GenericGenerator(
             name = "snowflakeIdGenerator",
             strategy = "org.myShortLink.admin.config.SnowflakeIdGenerator"
     )
     private Long id;
 
-    @Column(length = 256, nullable = false, unique = true, updatable = false)
+    @Column(length = 56, nullable = false, unique = true)
+    private String gid;
+
+    @Column(length = 56)
+    private String groupName;
+
+    @Column(length = 256, unique = true)
     private String username;
 
-    @Column(length = 256)
-    private String password;
-
-    @Column(length = 512, unique = true)
-    private String email;
-
-    @Column(length = 100, unique = true)
-    private String phoneNumber;
+    @Builder.Default
+    @Column(length = 3, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer sortOrder = 0;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean archived;
@@ -46,4 +54,5 @@ public class User {
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
 }
