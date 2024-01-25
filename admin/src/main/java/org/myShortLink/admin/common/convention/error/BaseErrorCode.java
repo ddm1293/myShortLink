@@ -20,8 +20,10 @@ public enum BaseErrorCode implements IErrorCode {
     PASSWORD_SHORT_ERROR("A000121", "Password Length Insufficient"),
     USER_JSON_PARSE_ERROR("A000122", "Cannot Parse User JSON"),
     PASSWORD_MISMATCH_ERROR("A000123", "Password Mismatch"),
-    USER_ALREADY_LOGGED_IN_ERROR("A000124", "USER HAS ALREADY LOGGED IN"),
-    USER_NOT_LOGGED_IN_ERROR("A000125", "USER NOT LOGGED IN"),
+    USER_ALREADY_LOGGED_IN_ERROR("A000124", "User HAS ALREADY LOGGED IN"),
+    USER_NOT_LOGGED_IN_ERROR("A000125", "User NOT LOGGED IN"),
+
+    GROUP_NOT_FOUND_ERROR("A000126", "Group Not Found"),
 
     //  Tier-Two Errors: System Requests Missing Idempotent Token
     IDEMPOTENT_TOKEN_NULL_ERROR("A000200", "Idempotent Token is Null"),

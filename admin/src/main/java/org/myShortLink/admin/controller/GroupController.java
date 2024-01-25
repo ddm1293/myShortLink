@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.myShortLink.admin.common.convention.result.Result;
 import org.myShortLink.admin.common.convention.result.Results;
 import org.myShortLink.admin.dto.req.GroupAddReqDTO;
+import org.myShortLink.admin.dto.req.GroupUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.GroupRespDTO;
 import org.myShortLink.admin.service.GroupService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,5 +31,17 @@ public class GroupController {
     @GetMapping("/group")
     public Result<List<GroupRespDTO>> getGroups() {
         return Results.success(groupService.getGroups());
+    }
+
+    @PutMapping("/group")
+    public Result<Void> updateGroup(@RequestBody GroupUpdateReqDTO reqBody) {
+        groupService.updateGroup(reqBody);
+        return Results.success();
+    }
+
+    @DeleteMapping("/group")
+    public Result<Void> deleteGroup(@RequestParam String gid) {
+        groupService.deleteGroup(gid);
+        return Results.success();
     }
 }
