@@ -12,11 +12,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Data
-@Entity
-@Table(name ="t_group")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name ="t_group", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"gid", "username"})
+})
 public class Group {
 
     @Id
@@ -29,13 +31,13 @@ public class Group {
     )
     private Long id;
 
-    @Column(length = 56, nullable = false, unique = true)
+    @Column(length = 56, nullable = false)
     private String gid;
 
     @Column(length = 56)
     private String groupName;
 
-    @Column(length = 256, unique = true)
+    @Column(length = 256)
     private String username;
 
     @Builder.Default

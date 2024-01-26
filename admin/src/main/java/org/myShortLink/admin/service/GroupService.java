@@ -1,5 +1,6 @@
 package org.myShortLink.admin.service;
 
+import org.myShortLink.admin.dto.req.GroupSortReqDTO;
 import org.myShortLink.admin.dto.req.GroupUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.GroupRespDTO;
 
@@ -14,4 +15,6 @@ public interface GroupService {
     void updateGroup(GroupUpdateReqDTO reqBody);
 
     void deleteGroup(String gid);
+
+    void sortGroups(List<GroupSortReqDTO> reqDTO);
 }

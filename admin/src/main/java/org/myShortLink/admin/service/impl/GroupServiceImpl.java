@@ -8,6 +8,7 @@ import org.myShortLink.admin.common.convention.error.BaseErrorCode;
 import org.myShortLink.admin.common.convention.exception.ClientException;
 import org.myShortLink.admin.dao.entity.Group;
 import org.myShortLink.admin.dao.repository.GroupRepository;
+import org.myShortLink.admin.dto.req.GroupSortReqDTO;
 import org.myShortLink.admin.dto.req.GroupUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.GroupRespDTO;
 import org.myShortLink.admin.service.GroupService;
@@ -58,9 +59,21 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public void deleteGroup(String gid) {
         Group group = fetchGroup(UserContext.getUsername(), gid);
         group.setArchived(true);
         groupRepository.save(group);
+    }
+
+    @Override
+    @Transactional
+    public void sortGroups(List<GroupSortReqDTO> reqDTO) {
+        String username = UserContext.getUsername();
+        reqDTO.forEach(each -> {
+            Group group = fetchGroup(username, each.getGid());
+            group.setSortOrder(each.getSortOrder());
+            groupRepository.save(group);
+        });
     }
 }

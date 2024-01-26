@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.myShortLink.admin.common.convention.result.Result;
 import org.myShortLink.admin.common.convention.result.Results;
 import org.myShortLink.admin.dto.req.GroupAddReqDTO;
+import org.myShortLink.admin.dto.req.GroupSortReqDTO;
 import org.myShortLink.admin.dto.req.GroupUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.GroupRespDTO;
 import org.myShortLink.admin.service.GroupService;
@@ -16,11 +17,6 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
-
-    @GetMapping("/hello")
-    public Result<String> hello() {
-        return Results.success("hello world");
-    }
 
     @PostMapping("/group")
     public Result<Void> addGroup(@RequestBody GroupAddReqDTO reqBody) {
@@ -42,6 +38,12 @@ public class GroupController {
     @DeleteMapping("/group")
     public Result<Void> deleteGroup(@RequestParam String gid) {
         groupService.deleteGroup(gid);
+        return Results.success();
+    }
+
+    @PostMapping("/group/sort")
+    public Result<Void> sortGroups(@RequestBody List<GroupSortReqDTO> reqDTO) {
+        groupService.sortGroups(reqDTO);
         return Results.success();
     }
 }

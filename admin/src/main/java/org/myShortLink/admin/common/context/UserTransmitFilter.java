@@ -25,6 +25,7 @@ public class UserTransmitFilter implements Filter {
             Object userInfoJson = stringRedisTemplate.opsForHash().get("login_" + username, token);
             if (userInfoJson != null) {
                 UserInfo userInfo = new ObjectMapper().readValue(userInfoJson.toString(), UserInfo.class);
+                userInfo.setToken(token);
                 log.debug("see userInfo: {}", userInfo);
                 UserContext.setUser(userInfo);
             }
