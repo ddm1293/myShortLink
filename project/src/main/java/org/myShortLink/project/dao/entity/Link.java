@@ -22,7 +22,7 @@ public class Link {
             generator = "snowflakeIdGenerator")
     @GenericGenerator(
             name = "snowflakeIdGenerator",
-            strategy = "org.myShortLink.project.config.SnowflakeIdGenerator"
+            strategy = "org.myShortLink.common.config.SnowflakeIdGenerator"
     )
     private Long id;
 

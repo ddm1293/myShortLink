@@ -13,6 +13,7 @@
         <module>admin</module>
         <module>project</module>
         <module>gateway</module>
+        <module>common</module>
     </modules>
 
     <properties>
@@ -32,6 +33,7 @@
         <spring-boot-jpa.version>3.2.1</spring-boot-jpa.version>
         <spring-boot-starter-test.version>3.2.1</spring-boot-starter-test.version>
         <spring-boot-starter-security.version>3.1.2</spring-boot-starter-security.version>
+        <common-package.version>1.0-SNAPSHOT</common-package.version>
     </properties>
 
     <dependencies>
@@ -131,6 +133,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-security</artifactId>
                 <version>${spring-boot-starter-security.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.myShortLink</groupId>
+                <artifactId>common</artifactId>
+                <version>${common-package.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
