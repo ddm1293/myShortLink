@@ -5,11 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
+import org.myShortLink.common.database.BaseDO;
 
 @Data
 @NoArgsConstructor
@@ -19,7 +16,7 @@ import java.time.LocalDateTime;
 @Table(name ="t_group", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"gid", "username"})
 })
-public class Group {
+public class Group extends BaseDO {
 
     @Id
     @GeneratedValue(
@@ -43,18 +40,4 @@ public class Group {
     @Builder.Default
     @Column(length = 3, columnDefinition = "INTEGER DEFAULT 0")
     private Integer sortOrder = 0;
-
-    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-    private boolean archived;
-
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    private LocalDateTime archivedAt;
-
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
 }

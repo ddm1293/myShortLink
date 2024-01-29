@@ -2,16 +2,13 @@ package org.myShortLink.admin.dao.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
+import org.myShortLink.common.database.BaseDO;
 
 @Entity
 @Table(name = "t_user")
 @Data
-public class User {
+public class User extends BaseDO {
 
     @Id
     @GeneratedValue(
@@ -33,17 +30,4 @@ public class User {
 
     @Column(length = 100, unique = true)
     private String phoneNumber;
-
-    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-    private boolean archived;
-
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    private LocalDateTime archivedAt;
-
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 }
