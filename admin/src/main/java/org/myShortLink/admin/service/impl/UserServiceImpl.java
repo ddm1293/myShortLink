@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.myShortLink.admin.common.convention.error.BaseErrorCode;
-import org.myShortLink.admin.common.convention.exception.ClientException;
 import org.myShortLink.admin.dao.entity.User;
 import org.myShortLink.admin.dao.repository.UserRepository;
 import org.myShortLink.admin.dto.req.UserLoginReqDTO;
@@ -16,6 +14,8 @@ import org.myShortLink.admin.dto.req.UserUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.UserLoginRespDTO;
 import org.myShortLink.admin.dto.resp.UserRespDTO;
 import org.myShortLink.admin.service.UserService;
+import org.myShortLink.common.convention.error.BaseErrorCode;
+import org.myShortLink.common.convention.exception.ClientException;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static org.myShortLink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
+import static org.myShortLink.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
 
 @Slf4j
 @Service

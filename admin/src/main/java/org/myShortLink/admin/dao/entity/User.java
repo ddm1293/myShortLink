@@ -18,7 +18,7 @@ public class User {
             generator = "snowflakeIdGenerator")
     @GenericGenerator(
             name = "snowflakeIdGenerator",
-            strategy = "org.myShortLink.admin.config.SnowflakeIdGenerator"
+            strategy = "org.myShortLink.common.config.SnowflakeIdGenerator"
     )
     private Long id;
 

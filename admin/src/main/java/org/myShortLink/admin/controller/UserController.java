@@ -1,14 +1,14 @@
 package org.myShortLink.admin.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.myShortLink.admin.common.convention.result.Result;
-import org.myShortLink.admin.common.convention.result.Results;
 import org.myShortLink.admin.dto.req.UserLoginReqDTO;
 import org.myShortLink.admin.dto.req.UserRegisterReqDTO;
 import org.myShortLink.admin.dto.req.UserUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.UserLoginRespDTO;
 import org.myShortLink.admin.dto.resp.UserRespDTO;
 import org.myShortLink.admin.service.UserService;
+import org.myShortLink.common.convention.result.Result;
+import org.myShortLink.common.convention.result.Results;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
