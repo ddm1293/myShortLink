@@ -1,11 +1,13 @@
 package org.myShortLink.common.database;
 
 import jakarta.persistence.Column;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+@Data
 public class BaseDO {
 
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
