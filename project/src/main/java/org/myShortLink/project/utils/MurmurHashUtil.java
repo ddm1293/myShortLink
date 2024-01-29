@@ -16,7 +16,7 @@ public class MurmurHashUtil {
     private static final int SIZE = CHARS.length;
 
     private static Long readUnsignedLong(Long value) {
-        return value >= 0 ? value : value & Long.MAX_VALUE;
+        return value >= 0 ? value : Integer.MAX_VALUE - value;
     }
 
     private static String toBase62(Long hash) {
@@ -34,5 +34,4 @@ public class MurmurHashUtil {
         int hashed = hashFunc.hashString(input, StandardCharsets.UTF_8).asInt();
         return toBase62(readUnsignedLong((long) hashed));
     }
-
 }

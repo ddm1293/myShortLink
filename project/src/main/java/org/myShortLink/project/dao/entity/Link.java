@@ -2,6 +2,7 @@ package org.myShortLink.project.dao.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "t_link")
 public class Link extends BaseDO {
@@ -31,14 +33,14 @@ public class Link extends BaseDO {
     @Column(length = 128)
     private String domain;
 
-    @Column(length = 8)
-    private String shortURI;
+    @Column(columnDefinition = "VARCHAR(8) COLLATE utf8mb4_bin")
+    private String shortUrl;
 
-    @Column(length = 128, unique = true)
-    private String fullShortURL;
+    @Column(unique = true, columnDefinition = "VARCHAR(128) COLLATE utf8mb4_bin")
+    private String fullShortUrl;
 
     @Column(length = 1024)
-    private String originalURL;
+    private String originalUrl;
 
     @Column(length = 11, columnDefinition = "INTEGER DEFAULT 0")
     private Integer clickNumber = 0;
