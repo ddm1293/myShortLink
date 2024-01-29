@@ -67,10 +67,6 @@
             <groupId>org.myShortLink</groupId>
             <artifactId>common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.myShortLink</groupId>
-            <artifactId>common</artifactId>
-        </dependency>
     </dependencies>
 
 
