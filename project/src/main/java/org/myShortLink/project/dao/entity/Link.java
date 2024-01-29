@@ -46,8 +46,18 @@ public class Link {
 
     private Boolean enabled;
 
+    /**
+     * Create Type:
+     *      0: Created by interface
+     *      1: Created by console
+     */
     private Boolean createdType;
 
+    /**
+     * Valid Date Type:
+     *      0: Permanent
+     *      1: Custom
+     */
     private Boolean validDateType;
 
     private LocalDateTime validDate;
