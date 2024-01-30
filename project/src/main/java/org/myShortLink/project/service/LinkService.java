@@ -2,8 +2,12 @@ package org.myShortLink.project.service;
 
 import org.myShortLink.project.dto.req.ShortLinkCreateReqDTO;
 import org.myShortLink.project.dto.resp.ShortLinkCreateRespDTO;
+import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
+import org.springframework.data.domain.Page;
 
 public interface LinkService {
 
     ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO reqBody);
+
+    Page<ShortLinkPageRespDTO> getShortLinks(String gid, String orderTag, int currentPage, int size);
 }

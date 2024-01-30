@@ -34,7 +34,7 @@ public class Link extends BaseDO {
     private String domain;
 
     @Column(columnDefinition = "VARCHAR(8) COLLATE utf8mb4_bin")
-    private String shortUrl;
+    private String shortUri;
 
     @Column(unique = true, columnDefinition = "VARCHAR(128) COLLATE utf8mb4_bin")
     private String fullShortUrl;
@@ -65,4 +65,7 @@ public class Link extends BaseDO {
 
     @Column(length = 1024)
     private String description;
+
+    @Column(length = 256)
+    private String favicon;
 }

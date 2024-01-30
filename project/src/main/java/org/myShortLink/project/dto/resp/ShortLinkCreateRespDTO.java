@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class ShortLinkCreateRespDTO {
     private String gid;
     private String originalUrl;
-    private String fullShortURL;
+    private String fullShortUrl;
 }

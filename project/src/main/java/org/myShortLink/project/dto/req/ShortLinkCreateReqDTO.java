@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class ShortLinkCreateReqDTO {
     private String gid;
     private String domain;
-    private String originalURL;
+    private String originalUrl;
     private Boolean createdType;
     private Boolean validDateType;
     private LocalDateTime validDate;

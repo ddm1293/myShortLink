@@ -1,5 +1,6 @@
 package org.myShortLink.project.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.common.convention.exception.ServiceException;
@@ -7,10 +8,14 @@ import org.myShortLink.project.dao.entity.Link;
 import org.myShortLink.project.dao.repository.LinkRepository;
 import org.myShortLink.project.dto.req.ShortLinkCreateReqDTO;
 import org.myShortLink.project.dto.resp.ShortLinkCreateRespDTO;
+import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.project.service.LinkService;
 import org.myShortLink.project.utils.MurmurHashUtil;
 import org.redisson.api.RBloomFilter;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static org.myShortLink.project.common.constant.LinkGenerateConstant.SUFFIX_GENERATE_CAP;
@@ -26,14 +31,14 @@ public class LinkServiceImpl implements LinkService {
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO reqBody) {
-        String suffix = generateSuffix(reqBody.getOriginalURL(), reqBody.getDomain());
+        String suffix = generateSuffix(reqBody.getOriginalUrl(), reqBody.getDomain());
         String fullShortUrl = reqBody.getDomain() + "/" + suffix;
         Link link = Link.builder()
                 .gid(reqBody.getGid())
                 .domain(reqBody.getDomain())
-                .shortUrl(suffix)
+                .shortUri(suffix)
                 .fullShortUrl(fullShortUrl)
-                .originalUrl(reqBody.getOriginalURL())
+                .originalUrl(reqBody.getOriginalUrl())
                 .enabled(true)
                 .createdType(reqBody.getCreatedType())
                 .validDateType(reqBody.getValidDateType())
@@ -53,8 +58,8 @@ public class LinkServiceImpl implements LinkService {
         shortUrlCreateBloomFilter.add(fullShortUrl);
 
         return ShortLinkCreateRespDTO.builder()
-                .fullShortURL(link.getFullShortUrl())
-                .originalUrl(reqBody.getOriginalURL())
+                .fullShortUrl(link.getFullShortUrl())
+                .originalUrl(reqBody.getOriginalUrl())
                 .gid(reqBody.getGid())
                 .build();
     }
@@ -75,5 +80,13 @@ public class LinkServiceImpl implements LinkService {
             generateCount++;
         }
         return suffix;
+    }
+
+    @Override
+    public Page<ShortLinkPageRespDTO> getShortLinks(String gid, String orderTag, int currentPage, int size) {
+        Pageable pageable = PageRequest.of(currentPage, size);
+        Page<Link> links = linkRepository.findLinks(gid, pageable);
+        Page<ShortLinkPageRespDTO> results = links.map(link -> BeanUtil.toBean(link, ShortLinkPageRespDTO.class));
+        return results;
     }
 }

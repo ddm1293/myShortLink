@@ -21,4 +21,4 @@ spring:
 
 logging:
   level:
-    org.myShortLink.admin: DEBUG
+    org.myShortLink.project: DEBUG
