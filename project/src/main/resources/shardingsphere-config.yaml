@@ -1,0 +1,40 @@
+dataSources:
+  ds_0:
+    username: root
+    url: jdbc:mysql://localhost:3306/myShortLink?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connection-test-query: select 1
+      connection-timeout: 20000
+      idle-timeout: 300000
+      maximum-pool-size: 5
+      minimum-idle: 5
+
+rules:
+  - !SHARDING
+    tables:
+      t_link:
+        actualDataNodes: ds_0.t_link_${0..15}
+        tableStrategy:
+          standard:
+            shardingColumn: gid
+            shardingAlgorithmName: link_table_hash_mod
+        keyGenerateStrategy:
+          column: id
+          keyGeneratorName: snowflake
+
+    shardingAlgorithms:
+      link_table_hash_mod:
+        type: HASH_MOD
+        props:
+          sharding-count: 16
+
+    keyGenerators:
+      snowflake:
+        type: SNOWFLAKE
+        props:
+          worker-id: 1
+
+props:
+  sql-show: true
