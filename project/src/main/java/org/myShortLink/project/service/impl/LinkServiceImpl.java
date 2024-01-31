@@ -85,8 +85,7 @@ public class LinkServiceImpl implements LinkService {
     @Override
     public Page<ShortLinkPageRespDTO> getShortLinks(String gid, String orderTag, int currentPage, int size) {
         Pageable pageable = PageRequest.of(currentPage, size);
-        Page<Link> links = linkRepository.findLinks(gid, pageable);
-        Page<ShortLinkPageRespDTO> results = links.map(link -> BeanUtil.toBean(link, ShortLinkPageRespDTO.class));
-        return results;
+        return linkRepository.findLinks(gid, pageable)
+                .map(link -> BeanUtil.toBean(link, ShortLinkPageRespDTO.class));
     }
 }
