@@ -24,18 +24,15 @@ public class ShortLinkRemoteServiceImpl implements ShortLinkRemoteService {
     private WebClient webClient;
 
     public Page<ShortLinkPageRespDTO> getShortLinks(String gid, String orderTag, int currentPage, int size) {
-        String url = "http://localhost:8001/link/page";
         String response = webClient.get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(url)
-//                        .queryParam("gid", gid)
-//                        .build())
-                .uri(url + "?gid=" + gid)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/link/page")
+                        .queryParam("gid", gid)
+                        .build())
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
 
-        log.debug("see response: {}", response);
         try {
             return new ObjectMapper()
                     .registerModule(new JavaTimeModule())
@@ -44,7 +41,7 @@ public class ShortLinkRemoteServiceImpl implements ShortLinkRemoteService {
                     .readValue(response, new TypeReference<Result<Page<ShortLinkPageRespDTO>>>() {})
                     .getData();
         } catch (JsonProcessingException e) {
-            log.error("see exception", e);
+            log.error("see JsonProcessingException", e);
             // TODO new error code
             throw new ServiceException("Error when deserializing Json");
         }
