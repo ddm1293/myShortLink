@@ -8,4 +8,5 @@ public class GroupRespDTO {
     private String groupName;
     private String username;
     private Integer sortOrder;
+    private Integer count;
 }

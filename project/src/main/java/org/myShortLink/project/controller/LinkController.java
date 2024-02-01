@@ -1,15 +1,20 @@
 package org.myShortLink.project.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.common.convention.result.Result;
 import org.myShortLink.common.convention.result.Results;
 import org.myShortLink.project.dto.req.ShortLinkCreateReqDTO;
+import org.myShortLink.project.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.project.service.LinkService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class LinkController {
@@ -27,6 +32,11 @@ public class LinkController {
                                                             @RequestParam(defaultValue = "0") int currentPage,
                                                             @RequestParam(defaultValue = "10") int size) {
         return Results.success(linkService.getShortLinks(gid, orderTag, currentPage, size));
+    }
+
+    @GetMapping("/link/countInGroup")
+    public Result<List<GroupCountQueryRespDTO>> groupCount(@RequestParam("gidList") List<String> gidList) {
+        return Results.success(linkService.groupCount(gidList));
     }
 
 }

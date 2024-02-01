@@ -28,9 +28,15 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public void addGroup(String groupName) {
+        String username = UserContext.getUsername();
+        if (username == null) {
+            // TODO new error code
+            // TODO need a universal treatment of no header situation
+            throw new ClientException("No username in the header potentially");
+        }
         Group group = Group.builder()
                 .gid(UUID.randomUUID().toString())
-                .username(UserContext.getUsername())
+                .username(username)
                 .groupName(groupName)
                 .build();
         log.debug("see username: {}", UserContext.getUsername());

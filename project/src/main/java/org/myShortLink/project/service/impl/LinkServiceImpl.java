@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.common.convention.exception.ServiceException;
 import org.myShortLink.project.dao.entity.Link;
 import org.myShortLink.project.dao.repository.LinkRepository;
+import org.myShortLink.project.dao.repository.projection.GroupLinkCount;
 import org.myShortLink.project.dto.req.ShortLinkCreateReqDTO;
+import org.myShortLink.project.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.project.service.LinkService;
@@ -17,6 +19,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.myShortLink.project.common.constant.LinkGenerateConstant.SUFFIX_GENERATE_CAP;
 
@@ -87,5 +92,17 @@ public class LinkServiceImpl implements LinkService {
         Pageable pageable = PageRequest.of(currentPage, size);
         return linkRepository.findLinks(gid, pageable)
                 .map(link -> BeanUtil.toBean(link, ShortLinkPageRespDTO.class));
+    }
+
+    @Override
+    public List<GroupCountQueryRespDTO> groupCount(List<String> gidList) {
+        List<GroupCountQueryRespDTO> res = new ArrayList<>();
+        gidList.forEach(gid -> {
+            GroupLinkCount groupLinkCount = linkRepository.countGroupLink(gid);
+            if (groupLinkCount != null) {
+                res.add(new GroupCountQueryRespDTO(groupLinkCount.getGid(), groupLinkCount.getCount()));
+            }
+        });
+        return res;
     }
 }
