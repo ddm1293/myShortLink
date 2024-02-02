@@ -13,6 +13,7 @@ import org.myShortLink.admin.dto.req.UserRegisterReqDTO;
 import org.myShortLink.admin.dto.req.UserUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.UserLoginRespDTO;
 import org.myShortLink.admin.dto.resp.UserRespDTO;
+import org.myShortLink.admin.service.GroupService;
 import org.myShortLink.admin.service.UserService;
 import org.myShortLink.common.convention.error.BaseErrorCode;
 import org.myShortLink.common.convention.exception.ClientException;
@@ -48,6 +49,8 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     private final StringRedisTemplate stringRedisTemplate;
+
+    private final GroupService groupService;
 
     @Override
     public UserRespDTO getUserByUsername(String username) {
@@ -98,6 +101,10 @@ public class UserServiceImpl implements UserService {
                     usernameBloomFilter.add(reqBody.getUsername());
                     userEmailBloomFilter.add(reqBody.getEmail());
                     userPhoneNumberBloomFilter.add(reqBody.getPhoneNumber());
+
+                    // create a default group during new user registration
+                    // TODO set "DEFAULT" here to be a constant
+                    groupService.addGroup("DEFAULT", reqBody.getUsername());
                 } finally {
                     if (lock.isHeldByCurrentThread()) {
                         lock.unlock();

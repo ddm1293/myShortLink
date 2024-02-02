@@ -10,6 +10,8 @@ public interface GroupService {
 
     void addGroup(String groupName);
 
+    void addGroup(String groupName, String username);
+
     List<GroupRespDTO> getGroups();
 
     void updateGroup(GroupUpdateReqDTO reqBody);
