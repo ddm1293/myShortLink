@@ -47,6 +47,7 @@ public class GroupServiceImpl implements GroupService {
             throw new ClientException("No username in the header potentially");
         }
         groupRepository.save(Group.builder()
+                // TODO better gid generation
                 .gid(UUID.randomUUID().toString())
                 .username(username)
                 .groupName(groupName)

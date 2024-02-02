@@ -4,10 +4,13 @@ import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.common.convention.exception.ServiceException;
+import org.myShortLink.project.common.enums.ValidDateTypeEnum;
 import org.myShortLink.project.dao.entity.Link;
 import org.myShortLink.project.dao.repository.LinkRepository;
 import org.myShortLink.project.dao.repository.projection.GroupLinkCount;
 import org.myShortLink.project.dto.req.ShortLinkCreateReqDTO;
+import org.myShortLink.project.dto.req.ShortLinkUpdateLinkGroupReqDTO;
+import org.myShortLink.project.dto.req.ShortLinkUpdateReqDTO;
 import org.myShortLink.project.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
@@ -19,9 +22,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.myShortLink.project.common.constant.LinkGenerateConstant.SUFFIX_GENERATE_CAP;
 
@@ -35,6 +40,7 @@ public class LinkServiceImpl implements LinkService {
     private final RBloomFilter<String> shortUrlCreateBloomFilter;
 
     @Override
+    @Transactional
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO reqBody) {
         String suffix = generateSuffix(reqBody.getOriginalUrl(), reqBody.getDomain());
         String fullShortUrl = reqBody.getDomain() + "/" + suffix;
@@ -50,6 +56,7 @@ public class LinkServiceImpl implements LinkService {
                 .validDate(reqBody.getValidDate())
                 .description(reqBody.getDescription())
                 .build();
+        checkValidDateType(link);
 
         try {
             linkRepository.save(link);
@@ -67,6 +74,12 @@ public class LinkServiceImpl implements LinkService {
                 .originalUrl(reqBody.getOriginalUrl())
                 .gid(reqBody.getGid())
                 .build();
+    }
+
+    private void checkValidDateType(Link link) {
+        if (Objects.equals(link.getValidDateType(), ValidDateTypeEnum.PERMANENT.getType())) {
+            link.setValidDate(null);
+        }
     }
 
     private String generateSuffix(String originalURL, String domain) {
@@ -90,7 +103,7 @@ public class LinkServiceImpl implements LinkService {
     @Override
     public Page<ShortLinkPageRespDTO> getShortLinks(String gid, String orderTag, int currentPage, int size) {
         Pageable pageable = PageRequest.of(currentPage, size);
-        return linkRepository.findLinks(gid, pageable)
+        return linkRepository.findLinksUnderSameGroup(gid, pageable)
                 .map(link -> BeanUtil.toBean(link, ShortLinkPageRespDTO.class));
     }
 
@@ -104,5 +117,35 @@ public class LinkServiceImpl implements LinkService {
             }
         });
         return res;
+    }
+
+    @Override
+    @Transactional
+    public void updateLink(ShortLinkUpdateReqDTO reqBody) {
+        Link link = linkRepository.findLink(reqBody.getFullShortUrl());
+        link.setOriginalUrl(reqBody.getOriginalUrl());
+        link.setValidDateType(reqBody.getValidDateType());
+        link.setValidDate(reqBody.getValidDate());
+        link.setDescription(reqBody.getDescription());
+        checkValidDateType(link);
+        linkRepository.save(link);
+    }
+
+    @Override
+    @Transactional
+    public void updateLinkGroup(ShortLinkUpdateLinkGroupReqDTO reqBody) {
+        // TODO: should return an optional
+        try {
+            Link toBeDeleted = linkRepository.findLink(reqBody.getFullShortUrl());
+            Link link = BeanUtil.copyProperties(toBeDeleted, Link.class);
+            link.setId(null);
+            link.setGid(reqBody.getGid());
+            linkRepository.deleteLink(reqBody.getFullShortUrl());
+            linkRepository.save(link);
+        } catch (Exception e) {
+            log.error("Error deleting link when updating link group", e);
+            // TODO: new Error code
+            throw new ServiceException("Error deleting link when updating link group");
+        }
     }
 }

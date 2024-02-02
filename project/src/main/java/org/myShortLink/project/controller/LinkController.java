@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.common.convention.result.Result;
 import org.myShortLink.common.convention.result.Results;
 import org.myShortLink.project.dto.req.ShortLinkCreateReqDTO;
+import org.myShortLink.project.dto.req.ShortLinkUpdateLinkGroupReqDTO;
+import org.myShortLink.project.dto.req.ShortLinkUpdateReqDTO;
 import org.myShortLink.project.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
@@ -37,6 +39,18 @@ public class LinkController {
     @GetMapping("/link/countInGroup")
     public Result<List<GroupCountQueryRespDTO>> groupCount(@RequestParam("gidList") List<String> gidList) {
         return Results.success(linkService.groupCount(gidList));
+    }
+
+    @PutMapping("/link/update")
+    public Result<Void> updateLink(@RequestBody ShortLinkUpdateReqDTO reqBody) {
+        linkService.updateLink(reqBody);
+        return Results.success();
+    }
+
+    @PutMapping("/link/updateGroup")
+    public Result<Void> updateLinkGroup(@RequestBody ShortLinkUpdateLinkGroupReqDTO reqBody) {
+        linkService.updateLinkGroup(reqBody);
+        return Results.success();
     }
 
 }

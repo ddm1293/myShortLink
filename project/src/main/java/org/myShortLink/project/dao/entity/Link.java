@@ -27,7 +27,7 @@ public class Link extends BaseDO {
     )
     private Long id;
 
-    @Column(length = 56)
+    @Column(length = 56, updatable = false)
     private String gid;
 
     @Column(length = 128)
@@ -56,8 +56,8 @@ public class Link extends BaseDO {
 
     /**
      * Valid Date Type:
-     *      0: Permanent
-     *      1: Custom
+     *      FALSE: Permanent
+     *      TRUE: Custom
      */
     private Boolean validDateType;
 

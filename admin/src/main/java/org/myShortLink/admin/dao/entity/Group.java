@@ -34,7 +34,7 @@ public class Group extends BaseDO {
     @Column(length = 56)
     private String groupName;
 
-    @Column(length = 256)
+    @Column(length = 256, updatable = false)
     private String username;
 
     @Builder.Default
