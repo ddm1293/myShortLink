@@ -9,6 +9,8 @@ import org.myShortLink.admin.dao.repository.GroupRepository;
 import org.myShortLink.admin.dto.req.GroupSortReqDTO;
 import org.myShortLink.admin.dto.req.GroupUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.GroupRespDTO;
+import org.myShortLink.admin.remote.dto.ShortLinkRemoteService;
+import org.myShortLink.admin.remote.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.admin.service.GroupService;
 import org.myShortLink.common.convention.error.BaseErrorCode;
 import org.myShortLink.common.convention.exception.ClientException;
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -24,6 +28,8 @@ import java.util.UUID;
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
+
+    private final ShortLinkRemoteService shortLinkRemoteService;
 
     @Override
     @Transactional
@@ -45,10 +51,15 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupRespDTO> getGroups() {
-        log.debug("see username: {}", UserContext.getUsername());
-        List<Group> list = groupRepository.getGroups(UserContext.getUsername());
-        log.debug("see list: {}", list);
-        return BeanUtil.copyToList(list, GroupRespDTO.class);
+        List<Group> groups = groupRepository.getGroups(UserContext.getUsername());
+        List<String> gidList = groups.stream().map(Group::getGid).toList();
+        Map<String, Integer> countsMap = shortLinkRemoteService.groupCount(gidList).stream()
+                .collect(Collectors.toMap(GroupCountQueryRespDTO::getGid, GroupCountQueryRespDTO::getCount));
+        return groups.stream().map(group -> {
+            GroupRespDTO dto = BeanUtil.toBean(group, GroupRespDTO.class);
+            dto.setCount(countsMap.getOrDefault(group.getGid(), 0));
+            return dto;
+        }).toList();
     }
 
     private Group fetchGroup(String username, String gid) {

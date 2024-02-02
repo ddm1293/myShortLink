@@ -27,7 +27,7 @@ public class Link extends BaseDO {
     )
     private Long id;
 
-    @Column(length = 32)
+    @Column(length = 56)
     private String gid;
 
     @Column(length = 128)
