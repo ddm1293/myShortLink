@@ -1,5 +1,7 @@
 package org.myShortLink.project.service;
 
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.myShortLink.project.dto.req.ShortLinkCreateReqDTO;
 import org.myShortLink.project.dto.req.ShortLinkUpdateLinkGroupReqDTO;
 import org.myShortLink.project.dto.req.ShortLinkUpdateReqDTO;
@@ -14,11 +16,13 @@ public interface LinkService {
 
     ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO reqBody);
 
-    Page<ShortLinkPageRespDTO> getShortLinks(String gid, String orderTag, int currentPage, int size);
+    Page<ShortLinkPageRespDTO> getShortLinksIntoPage(String gid, String orderTag, int currentPage, int size);
 
     List<GroupCountQueryRespDTO> groupCount(List<String> gidList);
 
     void updateLink(ShortLinkUpdateReqDTO reqBody);
 
     void updateLinkGroup(ShortLinkUpdateLinkGroupReqDTO reqBody);
+
+    void restoreUrl(String shortUri, ServletRequest req, ServletResponse resp);
 }

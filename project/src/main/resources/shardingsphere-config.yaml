@@ -24,8 +24,22 @@ rules:
           column: id
           keyGeneratorName: snowflake
 
+      t_link_router:
+        actualDataNodes: ds_0.t_link_router_${0..15}
+        tableStrategy:
+          standard:
+            shardingColumn: full_short_url
+            shardingAlgorithmName: link_router_table_hash_mod
+        keyGenerateStrategy:
+          column: id
+          keyGeneratorName: snowflake
+
     shardingAlgorithms:
       link_table_hash_mod:
+        type: HASH_MOD
+        props:
+          sharding-count: 16
+      link_router_table_hash_mod:
         type: HASH_MOD
         props:
           sharding-count: 16

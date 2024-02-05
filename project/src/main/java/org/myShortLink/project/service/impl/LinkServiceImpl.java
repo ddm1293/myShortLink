@@ -1,12 +1,17 @@
 package org.myShortLink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.common.convention.exception.ServiceException;
 import org.myShortLink.project.common.enums.ValidDateTypeEnum;
 import org.myShortLink.project.dao.entity.Link;
+import org.myShortLink.project.dao.entity.LinkRouter;
 import org.myShortLink.project.dao.repository.LinkRepository;
+import org.myShortLink.project.dao.repository.LinkRouterRepository;
 import org.myShortLink.project.dao.repository.projection.GroupLinkCount;
 import org.myShortLink.project.dto.req.ShortLinkCreateReqDTO;
 import org.myShortLink.project.dto.req.ShortLinkUpdateLinkGroupReqDTO;
@@ -24,6 +29,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +43,8 @@ import static org.myShortLink.project.common.constant.LinkGenerateConstant.SUFFI
 public class LinkServiceImpl implements LinkService {
 
     private final LinkRepository linkRepository;
+
+    private final LinkRouterRepository linkRouterRepository;
 
     private final RBloomFilter<String> shortUrlCreateBloomFilter;
 
@@ -58,8 +67,14 @@ public class LinkServiceImpl implements LinkService {
                 .build();
         checkValidDateType(link);
 
+        LinkRouter linkRouter = LinkRouter.builder()
+                .gid(reqBody.getGid())
+                .fullShortUrl(fullShortUrl)
+                .build();
+
         try {
             linkRepository.save(link);
+            linkRouterRepository.save(linkRouter);
         } catch (DuplicateKeyException e) {
             log.warn("Duplicate Full URL Found: ", e);
             shortUrlCreateBloomFilter.add(fullShortUrl);
@@ -70,7 +85,7 @@ public class LinkServiceImpl implements LinkService {
         shortUrlCreateBloomFilter.add(fullShortUrl);
 
         return ShortLinkCreateRespDTO.builder()
-                .fullShortUrl(link.getFullShortUrl())
+                .fullShortUrl("http://" + link.getFullShortUrl())
                 .originalUrl(reqBody.getOriginalUrl())
                 .gid(reqBody.getGid())
                 .build();
@@ -101,10 +116,21 @@ public class LinkServiceImpl implements LinkService {
     }
 
     @Override
-    public Page<ShortLinkPageRespDTO> getShortLinks(String gid, String orderTag, int currentPage, int size) {
+    public Page<ShortLinkPageRespDTO> getShortLinksIntoPage(String gid, String orderTag, int currentPage, int size) {
         Pageable pageable = PageRequest.of(currentPage, size);
         return linkRepository.findLinksUnderSameGroup(gid, pageable)
-                .map(link -> BeanUtil.toBean(link, ShortLinkPageRespDTO.class));
+                .map(link -> {
+                    ShortLinkPageRespDTO resp = BeanUtil.toBean(link, ShortLinkPageRespDTO.class);
+                    resp.setDomain(ensureHttpPrefix(resp.getDomain()));
+                    return resp;
+                });
+    }
+
+    private String ensureHttpPrefix(String url) {
+        if (url == null) {
+            return null;
+        }
+        return url.startsWith("http://") || url.startsWith("https://") ? url : "http://" + url;
     }
 
     @Override
@@ -122,7 +148,7 @@ public class LinkServiceImpl implements LinkService {
     @Override
     @Transactional
     public void updateLink(ShortLinkUpdateReqDTO reqBody) {
-        Link link = linkRepository.findLink(reqBody.getFullShortUrl());
+        Link link = findLink(reqBody.getGid(), reqBody.getFullShortUrl());
         link.setOriginalUrl(reqBody.getOriginalUrl());
         link.setValidDateType(reqBody.getValidDateType());
         link.setValidDate(reqBody.getValidDate());
@@ -136,16 +162,39 @@ public class LinkServiceImpl implements LinkService {
     public void updateLinkGroup(ShortLinkUpdateLinkGroupReqDTO reqBody) {
         // TODO: should return an optional
         try {
-            Link toBeDeleted = linkRepository.findLink(reqBody.getFullShortUrl());
+            Link toBeDeleted = findLink(reqBody.getGid(), reqBody.getFullShortUrl());
             Link link = BeanUtil.copyProperties(toBeDeleted, Link.class);
             link.setId(null);
-            link.setGid(reqBody.getGid());
-            linkRepository.deleteLink(reqBody.getFullShortUrl());
+            link.setGid(reqBody.getGidChangedTo());
+            linkRepository.deleteLink(reqBody.getGid(), reqBody.getFullShortUrl());
             linkRepository.save(link);
         } catch (Exception e) {
             log.error("Error deleting link when updating link group", e);
             // TODO: new Error code
             throw new ServiceException("Error deleting link when updating link group");
         }
+    }
+
+    @Override
+    public void restoreUrl(String shortUri, ServletRequest req, ServletResponse resp) {
+        String serverName = req.getServerName();
+        String fullShortUrl = serverName + "/" + shortUri;
+        LinkRouter linkRouter = linkRouterRepository.getLinkRouterFromFullShortUrl(fullShortUrl)
+                .orElseThrow(() -> new ServiceException(MessageFormat.format(
+                        "Cannot find corresponding linkRouter with Uri: {0}", shortUri
+                )));
+        Link link = findLink(linkRouter.getGid(), fullShortUrl);
+        try {
+            ((HttpServletResponse) resp).sendRedirect(link.getOriginalUrl());
+        } catch (IOException e) {
+            log.debug("see IOException", e);
+            throw new ServiceException("Error when redirecting to original link");
+        }
+    }
+
+    private Link findLink(String gid, String fullShortUrl) {
+        return linkRepository.findLink(gid, fullShortUrl).orElseThrow(() ->
+                new ServiceException(MessageFormat.format(
+                        "Cannot find corresponding link with Uri: {0} under group {1}", fullShortUrl, gid)));
     }
 }

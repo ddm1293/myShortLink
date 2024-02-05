@@ -1,5 +1,7 @@
 package org.myShortLink.project.controller;
 
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.common.convention.result.Result;
@@ -29,11 +31,11 @@ public class LinkController {
     }
 
     @GetMapping("/link/page")
-    public Result<Page<ShortLinkPageRespDTO>> getShortLinks(@RequestParam String gid,
-                                                            @RequestParam(required = false) String orderTag,
-                                                            @RequestParam(defaultValue = "0") int currentPage,
-                                                            @RequestParam(defaultValue = "10") int size) {
-        return Results.success(linkService.getShortLinks(gid, orderTag, currentPage, size));
+    public Result<Page<ShortLinkPageRespDTO>> getShortLinksIntoPage(@RequestParam String gid,
+                                                                    @RequestParam(required = false) String orderTag,
+                                                                    @RequestParam(defaultValue = "0") int currentPage,
+                                                                    @RequestParam(defaultValue = "10") int size) {
+        return Results.success(linkService.getShortLinksIntoPage(gid, orderTag, currentPage, size));
     }
 
     @GetMapping("/link/countInGroup")
@@ -53,4 +55,11 @@ public class LinkController {
         return Results.success();
     }
 
+    @GetMapping("/{shortUri}")
+    public Result<Void> restoreUrl(@PathVariable("shortUri") String shortUri,
+                                           ServletRequest req,
+                                           ServletResponse resp) {
+        linkService.restoreUrl(shortUri, req, resp);
+        return Results.success();
+    }
 }

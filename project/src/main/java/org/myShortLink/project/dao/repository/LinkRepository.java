@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface LinkRepository extends JpaRepository<Link, Long> {
 
     @Query("SELECT l FROM Link l WHERE l.gid = :gid")
@@ -25,11 +27,11 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
     @Query("""
             SELECT l
             FROM Link l
-            WHERE l.fullShortUrl = :fullShortUrl AND l.archived = false AND l.enabled = true
+            WHERE l.gid = :gid AND l.fullShortUrl = :fullShortUrl AND l.archived = false AND l.enabled = true
             """)
-    Link findLink(@Param("fullShortUrl") String fullShortUrl);
+    Optional<Link> findLink(@Param("gid") String gid, @Param("fullShortUrl") String fullShortUrl);
 
     @Modifying
-    @Query("DELETE FROM Link l WHERE l.fullShortUrl = :fullShortUrl")
-    void deleteLink(@Param("fullShortUrl") String fullShortUrl);
+    @Query("DELETE FROM Link l WHERE l.gid = :gid AND l.fullShortUrl = :fullShortUrl")
+    void deleteLink(@Param("gid") String gid, @Param("fullShortUrl") String fullShortUrl);
 }
