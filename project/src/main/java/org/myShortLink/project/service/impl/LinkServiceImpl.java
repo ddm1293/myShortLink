@@ -189,6 +189,7 @@ public class LinkServiceImpl implements LinkService {
 
     @Override
     public void restoreUrl(String shortUri, ServletRequest req, ServletResponse resp) {
+        // TODO maybe implement a redis pipeline to optimize
         String serverName = req.getServerName();
         String fullShortUrl = serverName + "/" + shortUri;
         String originalLink = stringRedisTemplate.opsForValue().get(String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl));
