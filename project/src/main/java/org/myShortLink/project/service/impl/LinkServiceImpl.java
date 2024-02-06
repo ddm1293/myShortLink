@@ -38,9 +38,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
-import static org.myShortLink.common.constant.RedisCacheConstant.LOCK_SHORT_LINK_ROUTE_KEY;
-import static org.myShortLink.common.constant.RedisCacheConstant.ROUTE_TO_SHORT_LINK_KEY;
+import static org.myShortLink.common.constant.RedisCacheConstant.*;
 import static org.myShortLink.project.common.constant.LinkGenerateConstant.SUFFIX_GENERATE_CAP;
 
 @Slf4j
@@ -198,6 +199,15 @@ public class LinkServiceImpl implements LinkService {
             return;
         }
 
+        if (!shortUrlCreateBloomFilter.contains(fullShortUrl)) {
+            return;
+        }
+
+        String routerIsNull = stringRedisTemplate.opsForValue().get(String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, fullShortUrl));
+        if (StringUtil.isNotBlank(routerIsNull)) {
+            return;
+        }
+
         RLock lock = redissonClient.getLock(String.format(LOCK_SHORT_LINK_ROUTE_KEY, fullShortUrl));
         lock.lock();
         try {
@@ -210,11 +220,13 @@ public class LinkServiceImpl implements LinkService {
             }
 
             // non-existent in cache, get the original link in DB and store it in cache
-            LinkRouter linkRouter = linkRouterRepository.getLinkRouterFromFullShortUrl(fullShortUrl)
-                    .orElseThrow(() -> new ServiceException(MessageFormat.format(
-                            "Cannot find corresponding linkRouter with Uri: {0}", shortUri
-                    )));
-            Link link = findLink(linkRouter.getGid(), fullShortUrl);
+            Optional<LinkRouter> linkRouter = linkRouterRepository.getLinkRouterFromFullShortUrl(fullShortUrl);
+            if (linkRouter.isEmpty()) {
+                stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                return;
+            }
+
+            Link link = findLink(linkRouter.get().getGid(), fullShortUrl);
             stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl), link.getOriginalUrl());
             redirectTo((HttpServletResponse) resp, link.getOriginalUrl());
         } finally {
