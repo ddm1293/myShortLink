@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
+import jodd.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.common.convention.exception.ServiceException;
@@ -22,10 +23,13 @@ import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.project.service.LinkService;
 import org.myShortLink.project.utils.MurmurHashUtil;
 import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.myShortLink.common.constant.RedisCacheConstant.LOCK_SHORT_LINK_ROUTE_KEY;
+import static org.myShortLink.common.constant.RedisCacheConstant.ROUTE_TO_SHORT_LINK_KEY;
 import static org.myShortLink.project.common.constant.LinkGenerateConstant.SUFFIX_GENERATE_CAP;
 
 @Slf4j
@@ -47,6 +53,10 @@ public class LinkServiceImpl implements LinkService {
     private final LinkRouterRepository linkRouterRepository;
 
     private final RBloomFilter<String> shortUrlCreateBloomFilter;
+
+    private final StringRedisTemplate stringRedisTemplate;
+
+    private final RedissonClient redissonClient;
 
     @Override
     @Transactional
@@ -175,17 +185,49 @@ public class LinkServiceImpl implements LinkService {
         }
     }
 
+
     @Override
     public void restoreUrl(String shortUri, ServletRequest req, ServletResponse resp) {
         String serverName = req.getServerName();
         String fullShortUrl = serverName + "/" + shortUri;
-        LinkRouter linkRouter = linkRouterRepository.getLinkRouterFromFullShortUrl(fullShortUrl)
-                .orElseThrow(() -> new ServiceException(MessageFormat.format(
-                        "Cannot find corresponding linkRouter with Uri: {0}", shortUri
-                )));
-        Link link = findLink(linkRouter.getGid(), fullShortUrl);
+        String originalLink = stringRedisTemplate.opsForValue().get(String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl));
+
+        // check cache first for the original link
+        if (StringUtil.isNotBlank(originalLink)) {
+            redirectTo((HttpServletResponse) resp, originalLink);
+            return;
+        }
+
+        RLock lock = redissonClient.getLock(String.format(LOCK_SHORT_LINK_ROUTE_KEY, fullShortUrl));
+        lock.lock();
         try {
-            ((HttpServletResponse) resp).sendRedirect(link.getOriginalUrl());
+            // double-checking lock
+            originalLink = stringRedisTemplate.opsForValue().get(String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl));
+
+            if (StringUtil.isNotBlank(originalLink)) {
+                redirectTo((HttpServletResponse) resp, originalLink);
+                return;
+            }
+
+            // non-existent in cache, get the original link in DB and store it in cache
+            LinkRouter linkRouter = linkRouterRepository.getLinkRouterFromFullShortUrl(fullShortUrl)
+                    .orElseThrow(() -> new ServiceException(MessageFormat.format(
+                            "Cannot find corresponding linkRouter with Uri: {0}", shortUri
+                    )));
+            Link link = findLink(linkRouter.getGid(), fullShortUrl);
+            stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl), link.getOriginalUrl());
+            redirectTo((HttpServletResponse) resp, link.getOriginalUrl());
+        } finally {
+            lock.unlock();
+        }
+
+
+
+    }
+
+    private void redirectTo(HttpServletResponse resp, String originalLink) {
+        try {
+            resp.sendRedirect(originalLink);
         } catch (IOException e) {
             log.debug("see IOException", e);
             throw new ServiceException("Error when redirecting to original link");
