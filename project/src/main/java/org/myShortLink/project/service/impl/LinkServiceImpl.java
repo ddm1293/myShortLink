@@ -21,6 +21,7 @@ import org.myShortLink.project.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.project.service.LinkService;
+import org.myShortLink.project.utils.LinkUtil;
 import org.myShortLink.project.utils.MurmurHashUtil;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
@@ -93,6 +94,12 @@ public class LinkServiceImpl implements LinkService {
             throw new ServiceException("Duplicate Full URL Found");
         }
 
+        stringRedisTemplate.opsForValue().set(
+                fullShortUrl,
+                reqBody.getOriginalUrl(),
+                LinkUtil.getLinkCacheValidDate(reqBody.getValidDate()),
+                TimeUnit.MILLISECONDS
+        );
         shortUrlCreateBloomFilter.add(fullShortUrl);
 
         return ShortLinkCreateRespDTO.builder()
