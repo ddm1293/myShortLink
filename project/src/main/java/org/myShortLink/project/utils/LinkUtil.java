@@ -10,8 +10,8 @@ import static org.myShortLink.common.constant.ShortLinkConstant.DEFAULT_CACHE_VA
 
 public class LinkUtil {
 
-    public static long getLinkCacheValidDate(LocalDateTime valiDate) {
-        return Optional.ofNullable(valiDate)
+    public static long getLinkCacheValidDate(LocalDateTime validDate) {
+        return Optional.ofNullable(validDate)
                 .map(date -> LocalDateTimeUtil.between(LocalDateTime.now(), date, ChronoUnit.MILLIS))
                 .orElse(DEFAULT_CACHE_VALID_TIME);
     }

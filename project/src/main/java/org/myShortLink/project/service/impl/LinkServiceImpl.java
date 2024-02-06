@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -95,7 +96,7 @@ public class LinkServiceImpl implements LinkService {
         }
 
         stringRedisTemplate.opsForValue().set(
-                fullShortUrl,
+                String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl),
                 reqBody.getOriginalUrl(),
                 LinkUtil.getLinkCacheValidDate(reqBody.getValidDate()),
                 TimeUnit.MILLISECONDS
@@ -230,12 +231,24 @@ public class LinkServiceImpl implements LinkService {
             // non-existent in cache, get the original link in DB and store it in cache
             Optional<LinkRouter> linkRouter = linkRouterRepository.getLinkRouterFromFullShortUrl(fullShortUrl);
             if (linkRouter.isEmpty()) {
-                stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
                 return;
             }
 
             Link link = findLink(linkRouter.get().getGid(), fullShortUrl);
-            stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl), link.getOriginalUrl());
+
+            // deal with outdated link
+            if (link.getValidDate() != null && link.getValidDate().isBefore(LocalDateTime.now())) {
+                stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                return;
+            }
+
+            stringRedisTemplate.opsForValue().set(
+                    String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl),
+                    link.getOriginalUrl(),
+                    LinkUtil.getLinkCacheValidDate(link.getValidDate()),
+                    TimeUnit.MILLISECONDS
+            );
             redirectTo((HttpServletResponse) resp, link.getOriginalUrl());
         } finally {
             lock.unlock();
