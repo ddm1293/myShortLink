@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.admin.remote.dto.ShortLinkRemoteService;
 import org.myShortLink.admin.remote.dto.resp.GroupCountQueryRespDTO;
+import org.myShortLink.admin.remote.dto.resp.OriginalLinkInfoRespDTO;
 import org.myShortLink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.common.convention.exception.ServiceException;
 import org.myShortLink.common.convention.result.Result;
@@ -64,6 +65,28 @@ public class ShortLinkRemoteServiceImpl implements ShortLinkRemoteService {
         try {
             return new ObjectMapper()
                     .readValue(response, new TypeReference<Result<List<GroupCountQueryRespDTO>>>() {})
+                    .getData();
+        } catch (JsonProcessingException e) {
+            log.error("see JsonProcessingException", e);
+            // TODO new error code
+            throw new ServiceException("Error when deserializing Json");
+        }
+    }
+
+    @Override
+    public OriginalLinkInfoRespDTO getOriginalLinkInfo(String link) {
+        String response = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/link/getLinkInfo")
+                        .queryParam("link", link)
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        try {
+            return new ObjectMapper()
+                    .readValue(response, new TypeReference<Result<OriginalLinkInfoRespDTO>>() {})
                     .getData();
         } catch (JsonProcessingException e) {
             log.error("see JsonProcessingException", e);
