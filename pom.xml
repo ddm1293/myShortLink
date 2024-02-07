@@ -34,6 +34,7 @@
         <common-package.version>1.0-SNAPSHOT</common-package.version>
         <spring-boot-starter-webflux.version>3.2.2</spring-boot-starter-webflux.version>
         <spring-cloud-starter-openfeign.version>4.1.0</spring-cloud-starter-openfeign.version>
+        <spring-boot-starter-thymeleaf.version>3.2.2</spring-boot-starter-thymeleaf.version>
     </properties>
 
     <dependencies>
@@ -145,6 +146,12 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-openfeign</artifactId>
                 <version>${spring-cloud-starter-openfeign.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-thymeleaf</artifactId>
+                <version>${spring-boot-starter-thymeleaf.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

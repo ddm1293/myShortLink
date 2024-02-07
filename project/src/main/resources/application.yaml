@@ -18,6 +18,10 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
 
 logging:
   level:

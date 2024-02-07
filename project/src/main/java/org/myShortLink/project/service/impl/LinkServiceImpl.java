@@ -209,11 +209,13 @@ public class LinkServiceImpl implements LinkService {
         }
 
         if (!shortUrlCreateBloomFilter.contains(fullShortUrl)) {
+            redirectTo((HttpServletResponse) resp, "/page/notFound");
             return;
         }
 
         String routerIsNull = stringRedisTemplate.opsForValue().get(String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, fullShortUrl));
         if (StringUtil.isNotBlank(routerIsNull)) {
+            redirectTo((HttpServletResponse) resp, "/page/notFound");
             return;
         }
 
@@ -232,6 +234,7 @@ public class LinkServiceImpl implements LinkService {
             Optional<LinkRouter> linkRouter = linkRouterRepository.getLinkRouterFromFullShortUrl(fullShortUrl);
             if (linkRouter.isEmpty()) {
                 stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                redirectTo((HttpServletResponse) resp, "/page/notFound");
                 return;
             }
 
@@ -240,6 +243,7 @@ public class LinkServiceImpl implements LinkService {
             // deal with outdated link
             if (link.getValidDate() != null && link.getValidDate().isBefore(LocalDateTime.now())) {
                 stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                redirectTo((HttpServletResponse) resp, "/page/notFound");
                 return;
             }
 
