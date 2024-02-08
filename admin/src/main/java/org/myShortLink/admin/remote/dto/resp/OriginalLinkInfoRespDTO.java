@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OriginalLinkInfoRespDTO {
     private String title;
+    private String favicon;
 }
