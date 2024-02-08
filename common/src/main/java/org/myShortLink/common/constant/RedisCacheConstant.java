@@ -10,5 +10,5 @@ public class RedisCacheConstant {
 
     public static final String LOCK_SHORT_LINK_ROUTE_KEY = "short_link_lock_goto_%s";
 
-    public static final String LINK_INFO_TITLE_KEY = "short_link_title: %s";
+    public static final String LINK_INFO_KEY = "short_link_info: %s";
 }
