@@ -1,11 +1,11 @@
-package org.myShortLink.admin.remote;
+package org.myShortLink.admin.remote.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
-import org.myShortLink.admin.remote.dto.ShortLinkRemoteService;
+import org.myShortLink.admin.remote.service.ShortLinkRemoteService;
 import org.myShortLink.admin.remote.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.admin.remote.dto.resp.OriginalLinkInfoRespDTO;
 import org.myShortLink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -27,6 +27,7 @@ public class ShortLinkRemoteServiceImpl implements ShortLinkRemoteService {
     @Autowired
     private WebClient webClient;
 
+    @Override
     public Page<ShortLinkPageRespDTO> getShortLinks(String gid, String orderTag, int currentPage, int size) {
         String response = webClient.get()
                 .uri(uriBuilder -> uriBuilder

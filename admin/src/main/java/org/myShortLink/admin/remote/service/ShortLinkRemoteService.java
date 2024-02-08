@@ -1,4 +1,4 @@
-package org.myShortLink.admin.remote.dto;
+package org.myShortLink.admin.remote.service;
 
 import org.myShortLink.admin.remote.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.admin.remote.dto.resp.OriginalLinkInfoRespDTO;

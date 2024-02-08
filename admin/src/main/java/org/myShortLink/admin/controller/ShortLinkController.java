@@ -1,7 +1,7 @@
 package org.myShortLink.admin.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.myShortLink.admin.remote.dto.ShortLinkRemoteService;
+import org.myShortLink.admin.remote.service.ShortLinkRemoteService;
 import org.myShortLink.admin.remote.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.common.convention.result.Result;

@@ -9,7 +9,7 @@ import org.myShortLink.admin.dao.repository.GroupRepository;
 import org.myShortLink.admin.dto.req.GroupSortReqDTO;
 import org.myShortLink.admin.dto.req.GroupUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.GroupRespDTO;
-import org.myShortLink.admin.remote.dto.ShortLinkRemoteService;
+import org.myShortLink.admin.remote.service.ShortLinkRemoteService;
 import org.myShortLink.admin.remote.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.admin.service.GroupService;
 import org.myShortLink.common.convention.error.BaseErrorCode;
