@@ -13,7 +13,11 @@ import java.util.Optional;
 
 public interface LinkRepository extends JpaRepository<Link, Long> {
 
-    @Query("SELECT l FROM Link l WHERE l.gid = :gid")
+    @Query("""
+            SELECT l
+            FROM Link l
+            WHERE l.gid = :gid AND l.archived = false AND l.enabled = true
+            """)
     Page<Link> findLinksUnderSameGroup(@Param("gid") String gid, Pageable pageable);
 
     @Query("""
@@ -34,4 +38,12 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
     @Modifying
     @Query("DELETE FROM Link l WHERE l.gid = :gid AND l.fullShortUrl = :fullShortUrl")
     void deleteLink(@Param("gid") String gid, @Param("fullShortUrl") String fullShortUrl);
+
+    @Modifying
+    @Query("UPDATE Link l SET l.enabled = false WHERE l.id = :id AND l.gid = :gid")
+    void disableLink(@Param("id") Long id, @Param("gid") String gid);
+
+    @Modifying
+    @Query("UPDATE Link l SET l.enabled = true WHERE l.id = :id AND l.gid = :gid")
+    void enableLink(@Param("id") Long id, @Param("gid") String gid);
 }

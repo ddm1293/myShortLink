@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +59,8 @@ public class LinkServiceImpl implements LinkService {
     private final StringRedisTemplate stringRedisTemplate;
 
     private final RedissonClient redissonClient;
+
+    private final LinkUtil linkUtil;
 
     @Override
     @Transactional
@@ -167,7 +168,7 @@ public class LinkServiceImpl implements LinkService {
     @Override
     @Transactional
     public void updateLink(ShortLinkUpdateReqDTO reqBody) {
-        Link link = findLink(reqBody.getGid(), reqBody.getFullShortUrl());
+        Link link = linkUtil.findLink(reqBody.getGid(), reqBody.getFullShortUrl());
         link.setOriginalUrl(reqBody.getOriginalUrl());
         link.setValidDateType(reqBody.getValidDateType());
         link.setValidDate(reqBody.getValidDate());
@@ -181,7 +182,7 @@ public class LinkServiceImpl implements LinkService {
     public void updateLinkGroup(ShortLinkUpdateLinkGroupReqDTO reqBody) {
         // TODO: should return an optional
         try {
-            Link toBeDeleted = findLink(reqBody.getGid(), reqBody.getFullShortUrl());
+            Link toBeDeleted = linkUtil.findLink(reqBody.getGid(), reqBody.getFullShortUrl());
             Link link = BeanUtil.copyProperties(toBeDeleted, Link.class);
             link.setId(null);
             link.setGid(reqBody.getGidChangedTo());
@@ -238,7 +239,7 @@ public class LinkServiceImpl implements LinkService {
                 return;
             }
 
-            Link link = findLink(linkRouter.get().getGid(), fullShortUrl);
+            Link link = linkUtil.findLink(linkRouter.get().getGid(), fullShortUrl);
 
             // deal with outdated link
             if (link.getValidDate() != null && link.getValidDate().isBefore(LocalDateTime.now())) {
@@ -269,11 +270,5 @@ public class LinkServiceImpl implements LinkService {
             log.debug("see IOException", e);
             throw new ServiceException("Error when redirecting to original link");
         }
-    }
-
-    private Link findLink(String gid, String fullShortUrl) {
-        return linkRepository.findLink(gid, fullShortUrl).orElseThrow(() ->
-                new ServiceException(MessageFormat.format(
-                        "Cannot find corresponding link with Uri: {0} under group {1}", fullShortUrl, gid)));
     }
 }
