@@ -239,10 +239,9 @@ public class LinkServiceImpl implements LinkService {
                 return;
             }
 
-            Link link = linkUtil.findLink(linkRouter.get().getGid(), fullShortUrl);
-
-            // deal with outdated link
-            if (link.getValidDate() != null && link.getValidDate().isBefore(LocalDateTime.now())) {
+            Optional<Link> link = linkRepository.findLink(linkRouter.get().getGid(), fullShortUrl);
+            // deal with non-existent, retired and outdated link
+            if (link.isEmpty() || (link.get().getValidDate() != null && link.get().getValidDate().isBefore(LocalDateTime.now()))) {
                 stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
                 redirectTo((HttpServletResponse) resp, "/page/notFound");
                 return;
@@ -250,16 +249,14 @@ public class LinkServiceImpl implements LinkService {
 
             stringRedisTemplate.opsForValue().set(
                     String.format(ROUTE_TO_SHORT_LINK_KEY, fullShortUrl),
-                    link.getOriginalUrl(),
-                    LinkUtil.getLinkCacheValidDate(link.getValidDate()),
+                    link.get().getOriginalUrl(),
+                    LinkUtil.getLinkCacheValidDate(link.get().getValidDate()),
                     TimeUnit.MILLISECONDS
             );
-            redirectTo((HttpServletResponse) resp, link.getOriginalUrl());
+            redirectTo((HttpServletResponse) resp, link.get().getOriginalUrl());
         } finally {
             lock.unlock();
         }
-
-
 
     }
 
