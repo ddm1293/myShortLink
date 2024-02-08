@@ -43,7 +43,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
             Connection.Response resp = Jsoup.connect(link).execute();
 
             if (resp.statusCode() == HttpStatus.HTTP_OK) {
-                Document doc = Jsoup.connect(link).get();
+                Document doc = resp.parse();
                 String title = StrUtil.isNotBlank(doc.title()) ? doc.title() : DEFAULT_TITLE;
                 String favicon = getFavicon(doc);
 
