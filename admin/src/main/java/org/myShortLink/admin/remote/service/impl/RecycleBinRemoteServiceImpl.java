@@ -89,6 +89,7 @@ public class RecycleBinRemoteServiceImpl implements RecycleBinRemoteService {
                 .block();
     }
 
+    // TODO needs an exception catcher
     @Override
     public void removeFromRecycleBin(RecycleBinRemoveReqDTO reqBody) {
         webClient.post()
