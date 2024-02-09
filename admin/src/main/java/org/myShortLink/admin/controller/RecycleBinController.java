@@ -22,10 +22,9 @@ public class RecycleBinController {
     }
 
     @GetMapping("/admin/remote/recycleBin/page")
-    public Result<Page<ShortLinkPageRespDTO>> getShortLinksIntoPage(@RequestParam String gid,
-                                                                    @RequestParam(required = false) String orderTag,
-                                                                    @RequestParam(defaultValue = "0") int currentPage,
-                                                                    @RequestParam(defaultValue = "10") int size) {
-        return Results.success(recycleBinRemoteServiceService.getDisabledShortLinksIntoPage(gid, orderTag, currentPage, size));
+    public Result<Page<ShortLinkPageRespDTO>> getDisabledShortLinksIntoPage(@RequestParam(required = false) String orderTag,
+                                                                            @RequestParam(defaultValue = "0") int currentPage,
+                                                                            @RequestParam(defaultValue = "10") int size) {
+        return Results.success(recycleBinRemoteServiceService.getDisabledShortLinksIntoPage(orderTag, currentPage, size));
     }
 }

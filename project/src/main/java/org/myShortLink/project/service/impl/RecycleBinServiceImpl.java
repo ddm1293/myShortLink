@@ -16,6 +16,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.myShortLink.common.constant.RedisCacheConstant.ROUTE_TO_SHORT_LINK_KEY;
 import static org.myShortLink.project.utils.LinkUtil.ensureHttpPrefix;
 
@@ -41,9 +43,9 @@ public class RecycleBinServiceImpl implements RecycleBinService {
     }
 
     @Override
-    public Page<ShortLinkPageRespDTO> getDisabledShortLinksIntoPage(String gid, String orderTag, int currentPage, int size) {
+    public Page<ShortLinkPageRespDTO> getDisabledShortLinksIntoPage(List<String> gidList, String orderTag, int currentPage, int size) {
         Pageable pageable = PageRequest.of(currentPage, size);
-        return linkRepository.findDisabledLinksUnderSameGroup(gid, pageable)
+        return linkRepository.findDisabledLinksUnderSameGroup(gidList, pageable)
                 .map(link -> {
                     ShortLinkPageRespDTO resp = BeanUtil.toBean(link, ShortLinkPageRespDTO.class);
                     resp.setDomain(ensureHttpPrefix(resp.getDomain()));

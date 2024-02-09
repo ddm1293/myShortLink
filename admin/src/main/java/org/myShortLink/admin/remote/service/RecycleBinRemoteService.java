@@ -8,5 +8,5 @@ public interface RecycleBinRemoteService {
 
     void saveRecycleBin(RecycleBinSaveReqDTO reqBody);
 
-    Page<ShortLinkPageRespDTO> getDisabledShortLinksIntoPage(String gid, String orderTag, int currentPage, int size);
+    Page<ShortLinkPageRespDTO> getDisabledShortLinksIntoPage(String orderTag, int currentPage, int size);
 }

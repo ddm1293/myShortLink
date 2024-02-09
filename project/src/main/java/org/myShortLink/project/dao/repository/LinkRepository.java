@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LinkRepository extends JpaRepository<Link, Long> {
@@ -21,11 +22,11 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
     Page<Link> findLinksUnderSameGroup(@Param("gid") String gid, Pageable pageable);
 
     @Query("""
-            SELECT l
-            FROM Link l
-            WHERE l.gid = :gid AND l.archived = false AND l.enabled = false
-            """)
-    Page<Link> findDisabledLinksUnderSameGroup(@Param("gid") String gid, Pageable pageable);
+        SELECT l
+        FROM Link l
+        WHERE l.gid IN :gidList AND l.archived = false AND l.enabled = false
+        """)
+    Page<Link> findDisabledLinksUnderSameGroup(@Param("gidList") List<String> gidList, Pageable pageable);
 
     @Query("""
             SELECT l.gid AS gid, COUNT(*) AS count

@@ -19,4 +19,6 @@ public interface GroupService {
     void deleteGroup(String gid);
 
     void sortGroups(List<GroupSortReqDTO> reqDTO);
+
+    List<String> getUserGroupGids();
 }

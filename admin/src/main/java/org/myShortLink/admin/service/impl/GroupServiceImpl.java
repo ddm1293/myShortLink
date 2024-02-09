@@ -1,6 +1,7 @@
 package org.myShortLink.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.admin.common.context.UserContext;
@@ -9,11 +10,12 @@ import org.myShortLink.admin.dao.repository.GroupRepository;
 import org.myShortLink.admin.dto.req.GroupSortReqDTO;
 import org.myShortLink.admin.dto.req.GroupUpdateReqDTO;
 import org.myShortLink.admin.dto.resp.GroupRespDTO;
-import org.myShortLink.admin.remote.service.ShortLinkRemoteService;
 import org.myShortLink.admin.remote.dto.resp.GroupCountQueryRespDTO;
+import org.myShortLink.admin.remote.service.ShortLinkRemoteService;
 import org.myShortLink.admin.service.GroupService;
 import org.myShortLink.common.convention.error.BaseErrorCode;
 import org.myShortLink.common.convention.exception.ClientException;
+import org.myShortLink.common.convention.exception.ServiceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,5 +99,14 @@ public class GroupServiceImpl implements GroupService {
             group.setSortOrder(each.getSortOrder());
             groupRepository.save(group);
         });
+    }
+
+    @Override
+    public List<String> getUserGroupGids() {
+        List<Group> groups = groupRepository.getGroups(UserContext.getUsername());
+        if (CollUtil.isEmpty(groups)) {
+            throw new ServiceException(String.format("User %s has no groups under their name", UserContext.getUsername()));
+        }
+        return groups.stream().map(Group::getGid).toList();
     }
 }

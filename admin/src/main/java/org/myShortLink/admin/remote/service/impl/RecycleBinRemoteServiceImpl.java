@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.myShortLink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.admin.remote.service.RecycleBinRemoteService;
+import org.myShortLink.admin.service.GroupService;
 import org.myShortLink.common.convention.exception.ServiceException;
 import org.myShortLink.common.convention.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +20,17 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
+
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RecycleBinRemoteServiceImpl implements RecycleBinRemoteService {
 
     @Autowired
     private WebClient webClient;
+
+    private final GroupService groupService;
 
     @Override
     public void saveRecycleBin(RecycleBinSaveReqDTO reqBody) {
@@ -39,11 +46,15 @@ public class RecycleBinRemoteServiceImpl implements RecycleBinRemoteService {
     }
 
     @Override
-    public Page<ShortLinkPageRespDTO> getDisabledShortLinksIntoPage(String gid, String orderTag, int currentPage, int size) {
+    public Page<ShortLinkPageRespDTO> getDisabledShortLinksIntoPage(String orderTag, int currentPage, int size) {
+        List<String> gidList = groupService.getUserGroupGids();
+
         String response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/recycleBin/page")
-                        .queryParam("gid", gid)
+                        .queryParam("gidList", gidList)
+                        .queryParam("currentPage", currentPage)
+                        .queryParam("size", size)
                         .build())
                 .retrieve()
                 .bodyToMono(String.class)
