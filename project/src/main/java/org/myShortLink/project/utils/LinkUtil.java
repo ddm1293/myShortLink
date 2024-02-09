@@ -32,6 +32,10 @@ public class LinkUtil {
                         "Cannot find corresponding link with Uri: {0} under group {1}", fullShortUrl, gid)));
     }
 
+    public Optional<Link> findLinkOptional(String gid, String fullShortUrl, Boolean archived, Boolean enabled) {
+        return linkRepository.findLink(gid, fullShortUrl, archived, enabled);
+    }
+
     public Link findLink(String gid, String fullShortUrl) {
         return findLink(gid, fullShortUrl, false, true);
     }

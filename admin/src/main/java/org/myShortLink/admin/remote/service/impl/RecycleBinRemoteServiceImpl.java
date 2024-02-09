@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
+import org.myShortLink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.myShortLink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.myShortLink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.admin.remote.service.RecycleBinRemoteService;
@@ -80,6 +81,19 @@ public class RecycleBinRemoteServiceImpl implements RecycleBinRemoteService {
         webClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/recycleBin/recover")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(reqBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+    @Override
+    public void removeFromRecycleBin(RecycleBinRemoveReqDTO reqBody) {
+        webClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/recycleBin/remove")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(reqBody)

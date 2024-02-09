@@ -4,9 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.myShortLink.common.convention.exception.ServiceException;
 import org.myShortLink.project.dao.entity.Link;
 import org.myShortLink.project.dao.repository.LinkRepository;
 import org.myShortLink.project.dto.req.RecycleBinRecoverReqDTO;
+import org.myShortLink.project.dto.req.RecycleBinRemoveReqDTO;
 import org.myShortLink.project.dto.req.RecycleBinSaveReqDTO;
 import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.project.service.RecycleBinService;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.myShortLink.common.constant.RedisCacheConstant.ROUTE_TO_SHORT_LINK_IS_NULL_KEY;
@@ -73,6 +76,21 @@ public class RecycleBinServiceImpl implements RecycleBinService {
             stringRedisTemplate.delete(
                     String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, reqBody.getFullShortUrl())
             );
+        }
+    }
+
+    @Override
+    @Transactional
+    public void removeInRecycleBin(RecycleBinRemoveReqDTO reqBody) {
+        Optional<Link> linkOptional = linkUtil.findLinkOptional(reqBody.getGid(), reqBody.getFullShortUrl(), false, true);
+
+        if (linkOptional.isPresent()) {
+            throw new ServiceException(String.format(
+                    "This link: %s is not disabled yet, cannot remove enabled link", reqBody.getFullShortUrl()
+            ));
+        } else {
+            Link link = linkUtil.findLink(reqBody.getGid(), reqBody.getFullShortUrl(), false, false);
+            linkRepository.archiveLink(link.getId(), link.getGid());
         }
     }
 }

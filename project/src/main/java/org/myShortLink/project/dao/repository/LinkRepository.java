@@ -59,4 +59,12 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
     @Modifying
     @Query("UPDATE Link l SET l.enabled = true WHERE l.id = :id AND l.gid = :gid")
     void enableLink(@Param("id") Long id, @Param("gid") String gid);
+
+    @Modifying
+    @Query("""
+            UPDATE Link l
+            SET l.archived = true, l.enabled = false
+            WHERE l.id = :id AND l.gid = :gid
+            """)
+    void archiveLink(@Param("id") Long id, @Param("gid") String gid);
 }
