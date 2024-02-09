@@ -1,6 +1,7 @@
 package org.myShortLink.admin.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.myShortLink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import org.myShortLink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.myShortLink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.admin.remote.service.RecycleBinRemoteService;
@@ -26,5 +27,11 @@ public class RecycleBinController {
                                                                             @RequestParam(defaultValue = "0") int currentPage,
                                                                             @RequestParam(defaultValue = "10") int size) {
         return Results.success(recycleBinRemoteServiceService.getDisabledShortLinksIntoPage(orderTag, currentPage, size));
+    }
+
+    @PostMapping("/admin/remote/recycleBin/recover")
+    public Result<Void> recoverFromRecycleBin(@RequestBody RecycleBinRecoverReqDTO reqBody) {
+        recycleBinRemoteServiceService.recoverFromRecycleBin(reqBody);
+        return Results.success();
     }
 }

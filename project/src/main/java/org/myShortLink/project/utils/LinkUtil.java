@@ -26,10 +26,14 @@ public class LinkUtil {
                 .orElse(DEFAULT_CACHE_VALID_TIME);
     }
 
-    public Link findLink(String gid, String fullShortUrl) {
-        return linkRepository.findLink(gid, fullShortUrl).orElseThrow(() ->
+    public Link findLink(String gid, String fullShortUrl, Boolean archived, Boolean enabled) {
+        return linkRepository.findLink(gid, fullShortUrl, archived, enabled).orElseThrow(() ->
                 new ServiceException(MessageFormat.format(
                         "Cannot find corresponding link with Uri: {0} under group {1}", fullShortUrl, gid)));
+    }
+
+    public Link findLink(String gid, String fullShortUrl) {
+        return findLink(gid, fullShortUrl, false, true);
     }
 
     public static String ensureHttpPrefix(String url) {

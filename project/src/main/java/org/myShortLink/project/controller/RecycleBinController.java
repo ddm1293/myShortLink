@@ -3,6 +3,7 @@ package org.myShortLink.project.controller;
 import lombok.RequiredArgsConstructor;
 import org.myShortLink.common.convention.result.Result;
 import org.myShortLink.common.convention.result.Results;
+import org.myShortLink.project.dto.req.RecycleBinRecoverReqDTO;
 import org.myShortLink.project.dto.req.RecycleBinSaveReqDTO;
 import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.project.service.RecycleBinService;
@@ -29,5 +30,11 @@ public class RecycleBinController {
                                                                             @RequestParam(defaultValue = "0") int currentPage,
                                                                             @RequestParam(defaultValue = "10") int size) {
         return Results.success(recycleBinService.getDisabledShortLinksIntoPage(gidList, orderTag, currentPage, size));
+    }
+
+    @PostMapping("/recycleBin/recover")
+    public Result<Void> recoverFromRecycleBin(@RequestBody RecycleBinRecoverReqDTO reqBody) {
+        recycleBinService.recoverFromRecycleBin(reqBody);
+        return Results.success();
     }
 }

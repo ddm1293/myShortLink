@@ -233,7 +233,7 @@ public class LinkServiceImpl implements LinkService {
                 return;
             }
 
-            Optional<Link> link = linkRepository.findLink(linkRouter.get().getGid(), fullShortUrl);
+            Optional<Link> link = linkRepository.findLink(linkRouter.get().getGid(), fullShortUrl, false, true);
             // deal with non-existent, retired and outdated link
             if (link.isEmpty() || (link.get().getValidDate() != null && link.get().getValidDate().isBefore(LocalDateTime.now()))) {
                 stringRedisTemplate.opsForValue().set(String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);

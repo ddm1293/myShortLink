@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.myShortLink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import org.myShortLink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.myShortLink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.admin.remote.service.RecycleBinRemoteService;
@@ -72,5 +73,18 @@ public class RecycleBinRemoteServiceImpl implements RecycleBinRemoteService {
             // TODO new error code
             throw new ServiceException("Error when deserializing Json");
         }
+    }
+
+    @Override
+    public void recoverFromRecycleBin(RecycleBinRecoverReqDTO reqBody) {
+        webClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/recycleBin/recover")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(reqBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 }

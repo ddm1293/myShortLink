@@ -39,9 +39,14 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
     @Query("""
             SELECT l
             FROM Link l
-            WHERE l.gid = :gid AND l.fullShortUrl = :fullShortUrl AND l.archived = false AND l.enabled = true
+            WHERE l.gid = :gid AND l.fullShortUrl = :fullShortUrl AND l.archived = :archived AND l.enabled = :enabled
             """)
-    Optional<Link> findLink(@Param("gid") String gid, @Param("fullShortUrl") String fullShortUrl);
+    Optional<Link> findLink(
+            @Param("gid") String gid,
+            @Param("fullShortUrl") String fullShortUrl,
+            @Param("archived") Boolean archived,
+            @Param("enabled") Boolean enabled
+    );
 
     @Modifying
     @Query("DELETE FROM Link l WHERE l.gid = :gid AND l.fullShortUrl = :fullShortUrl")

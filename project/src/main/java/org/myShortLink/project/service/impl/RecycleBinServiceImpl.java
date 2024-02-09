@@ -1,10 +1,12 @@
 package org.myShortLink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.project.dao.entity.Link;
 import org.myShortLink.project.dao.repository.LinkRepository;
+import org.myShortLink.project.dto.req.RecycleBinRecoverReqDTO;
 import org.myShortLink.project.dto.req.RecycleBinSaveReqDTO;
 import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.project.service.RecycleBinService;
@@ -17,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import static org.myShortLink.common.constant.RedisCacheConstant.ROUTE_TO_SHORT_LINK_IS_NULL_KEY;
 import static org.myShortLink.common.constant.RedisCacheConstant.ROUTE_TO_SHORT_LINK_KEY;
 import static org.myShortLink.project.utils.LinkUtil.ensureHttpPrefix;
 
@@ -51,5 +55,24 @@ public class RecycleBinServiceImpl implements RecycleBinService {
                     resp.setDomain(ensureHttpPrefix(resp.getDomain()));
                     return resp;
                 });
+    }
+
+    @Override
+    @Transactional
+    public void recoverFromRecycleBin(RecycleBinRecoverReqDTO reqBody) {
+        Link link = linkUtil.findLink(reqBody.getGid(), reqBody.getFullShortUrl(), false, false);
+        linkRepository.enableLink(link.getId(), link.getGid());
+
+        stringRedisTemplate.opsForValue().set(
+                String.format(ROUTE_TO_SHORT_LINK_KEY, reqBody.getFullShortUrl()),
+                link.getOriginalUrl(),
+                LinkUtil.getLinkCacheValidDate(link.getValidDate()),
+                TimeUnit.MILLISECONDS
+        );
+        if (StrUtil.isNotBlank(stringRedisTemplate.opsForValue().get(ROUTE_TO_SHORT_LINK_IS_NULL_KEY))) {
+            stringRedisTemplate.delete(
+                    String.format(ROUTE_TO_SHORT_LINK_IS_NULL_KEY, reqBody.getFullShortUrl())
+            );
+        }
     }
 }
