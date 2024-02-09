@@ -21,6 +21,13 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
     Page<Link> findLinksUnderSameGroup(@Param("gid") String gid, Pageable pageable);
 
     @Query("""
+            SELECT l
+            FROM Link l
+            WHERE l.gid = :gid AND l.archived = false AND l.enabled = false
+            """)
+    Page<Link> findDisabledLinksUnderSameGroup(@Param("gid") String gid, Pageable pageable);
+
+    @Query("""
             SELECT l.gid AS gid, COUNT(*) AS count
             FROM Link l
             WHERE l.archived = false AND l.enabled = true AND l.gid = :gid

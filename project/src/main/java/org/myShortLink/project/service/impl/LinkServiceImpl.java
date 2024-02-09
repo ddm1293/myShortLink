@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.myShortLink.common.constant.RedisCacheConstant.*;
 import static org.myShortLink.project.common.constant.LinkGenerateConstant.SUFFIX_GENERATE_CAP;
+import static org.myShortLink.project.utils.LinkUtil.ensureHttpPrefix;
 
 @Slf4j
 @Service
@@ -144,13 +145,6 @@ public class LinkServiceImpl implements LinkService {
                     resp.setDomain(ensureHttpPrefix(resp.getDomain()));
                     return resp;
                 });
-    }
-
-    private String ensureHttpPrefix(String url) {
-        if (url == null) {
-            return null;
-        }
-        return url.startsWith("http://") || url.startsWith("https://") ? url : "http://" + url;
     }
 
     @Override

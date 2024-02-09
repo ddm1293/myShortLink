@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.myShortLink.common.convention.result.Result;
 import org.myShortLink.common.convention.result.Results;
 import org.myShortLink.project.dto.req.RecycleBinSaveReqDTO;
+import org.myShortLink.project.dto.resp.ShortLinkPageRespDTO;
 import org.myShortLink.project.service.RecycleBinService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,5 +19,13 @@ public class RecycleBinController {
     public Result<Void> saveRecycleBin(@RequestBody RecycleBinSaveReqDTO reqBody) {
         recycleBinService.saveRecycleBin(reqBody);
         return Results.success();
+    }
+
+    @GetMapping("/recycleBin/page")
+    public Result<Page<ShortLinkPageRespDTO>> getShortLinksIntoPage(@RequestParam String gid,
+                                                                    @RequestParam(required = false) String orderTag,
+                                                                    @RequestParam(defaultValue = "0") int currentPage,
+                                                                    @RequestParam(defaultValue = "10") int size) {
+        return Results.success(recycleBinService.getDisabledShortLinksIntoPage(gid, orderTag, currentPage, size));
     }
 }

@@ -31,4 +31,11 @@ public class LinkUtil {
                 new ServiceException(MessageFormat.format(
                         "Cannot find corresponding link with Uri: {0} under group {1}", fullShortUrl, gid)));
     }
+
+    public static String ensureHttpPrefix(String url) {
+        if (url == null) {
+            return null;
+        }
+        return url.startsWith("http://") || url.startsWith("https://") ? url : "http://" + url;
+    }
 }
