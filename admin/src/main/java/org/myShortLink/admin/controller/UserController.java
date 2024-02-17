@@ -1,6 +1,7 @@
 package org.myShortLink.admin.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.myShortLink.admin.dto.req.UserLoginReqDTO;
 import org.myShortLink.admin.dto.req.UserRegisterReqDTO;
 import org.myShortLink.admin.dto.req.UserUpdateReqDTO;
@@ -11,6 +12,7 @@ import org.myShortLink.common.convention.result.Result;
 import org.myShortLink.common.convention.result.Results;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -51,7 +53,9 @@ public class UserController {
 
     @PostMapping("/user/login")
     public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO reqBody) {
-        return Results.success(userService.login(reqBody));
+        UserLoginRespDTO res = userService.login(reqBody);
+        log.debug("see user login token {}", res);
+        return Results.success(res);
     }
 
     @GetMapping("/user/check-login")
