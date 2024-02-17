@@ -6,16 +6,15 @@
 			:model="loginForm" ref="loginFormRef" 
 			label-width="50px" 
 			:rules="loginFormRules" 
-			@submit.prevent="login(loginFormRef)"
 		>
 			<div class="login-form-container">
-				<el-form-item>
+				<el-form-item prop="username">
 					<el-input v-model="loginForm.username" placeholder="请输入用户名" maxlength="11" show-word-limit clearable>
                 <template v-slot:prepend> 用户名 </template>
           </el-input>
 				</el-form-item>
 
-				<el-form-item>
+				<el-form-item prop="password">
 					<el-input v-model="loginForm.password" type="password" clearable placeholder="请输入密码" show-password
                 style="margin-top: 20px">
                 <template v-slot:prepend> 密<span class="second-font">码</span> </template>
@@ -37,14 +36,21 @@
 </template>
 
 <script setup>
-	import { ref, reactive } from 'vue'
-	const isLogin = ref(true)
+	import { ref, reactive, inject, getCurrentInstance } from 'vue'
+	import { setToken, setUsername, getUsername } from '@/auth/auth.js'
+	import { useRouter } from 'vue-router'
+	import { ElMessage } from 'element-plus'
+	const { proxy } = getCurrentInstance()
+	const API = proxy.$API
+	const router = useRouter()
+
+	const isLogin = inject('isLogin')
 	const loading = ref(false)
 	const checked = ref(true)
 	
 	const loginForm = reactive({
-  username: '',
-  password: '',
+		username: '',
+		password: '',
 })
 
 	const loginFormRef = ref()
@@ -57,70 +63,69 @@
 		],
 	})
 
+	const startLoading = () => {
+		loading.value = true;
+	}
+
+	const endLoading = () => {
+		loading.value = false;
+	}
+
 	const login = async (formEl) => {
 		if (!formEl) return
-		await formEl.validate((valid, fields) => {
+		startLoading();
+		try {
+			const valid = await formEl.validate();
 			if (valid) {
-				console.log('submit!')
-			} else {
-				console.log('error submit!', fields)
-				return
+				console.log('submit!: ', loginForm)
+			  const res = await API.user.login(loginForm)
+				console.log('see res', res)
+				if (res.data.code === '0') {
+					const token = res?.data?.data?.token
+					// 将username和token保存到cookies中和localStorage中
+					if (token) {
+						setToken(token)
+						setUsername(loginForm.username)
+						localStorage.setItem('token', token)
+						localStorage.setItem('username', loginForm.username)
+					}
+					ElMessage.success('登录成功！')
+					// router.push('/home')
+				} else if (res.data.message === 'User HAS ALREADY LOGGED IN') {
+					const cookiesUsername = getUsername()
+					if (cookiesUsername === loginForm.username) {
+						ElMessage.success('登录成功！')
+						console.log('登录成功！')
+						// router.push('/home')
+					} else {
+						ElMessage.warning('用户已在别处登录，请勿重复登录！')
+					}
+				} else if (res.data.message === 'Null User Found') {
+					ElMessage.error('请输入正确的账号密码!')
+				}
 			}
-		})
+		} catch (error) {
+			console.error("validation failed: ", error);
+		} finally {
+			endLoading();
+		}
 	}
 </script>
 
 <style lang="less" scoped>
 	.login {
-			display: flex;
-			flex-direction: column;
-			justify-content: space-between;
-	}
-	
-	h2 {
-    font-size: 30px;
-    font-family:
-      PingFangSC-Semibold,
-      PingFang SC;
-    font-weight: 600;
-    color: #3a3f63;
-    width: 100%;
-    text-align: center;
-    padding: 20px;
-  }
-
-	.el-form-item {
-    margin-bottom: 23px;
-  }
-
-	.button-group {
-    margin-top: 30px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-
-    .el-button {
-      width: 100px;
-    }
-
-		.el-checkbox {
-			width: 100%;
-			text-align: center;
-			margin-top: 1rem;
-  	}
-
-    .remeber-password {
-      left: 0;
-      line-height: 0.5rem;
-    }
-  }
-
-	/deep/ .el-form-item__content {
-  	margin-left: 0 !important;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
 	}
 
-	:deep(.el-input__suffix-inner) {
-		width: 60px;
+	.remeber-password {
+		left: 0;
+		line-height: 0.1rem;
+	}
+
+	.login-form-container {
+		transform: translateY(-70%);
 	}
 
 </style>

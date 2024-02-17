@@ -5,21 +5,23 @@
 <script setup>
   import { ref, onMounted, onBeforeUnmount } from 'vue'
   import * as THREE from 'three'
-  import GLOBE from 'vanta/dist/vanta.globe.min.js';
+  import CLOUDS from 'vanta/src/vanta.globe';
 
   const vantaRef = ref()
   let vantaEffect = null
   onMounted(() => {
-    vantaEffect = GLOBE({
-    el: vantaRef.value,
-    THREE: THREE,
-    mouseControls: true,
-    touchControls: true,
-    gyroControls: false,
-    minHeight: 200.00,
-    minWidth: 200.00,
-    scale: 1.00,
-    scaleMobile: 1.00
+    vantaEffect = CLOUDS({
+      el: vantaRef.value,
+      THREE: THREE,
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x3fc6ff,
+      backgroundColor: 0x14152a
     })
   })
   onBeforeUnmount(() => {

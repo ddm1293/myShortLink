@@ -11,8 +11,8 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
     (config) => {
-        config.headers.token = isNotEmpty(getToken()) ? getToken() : ''
-        config.headers.username = isNotEmpty(getUsername()) ? getUsername() : ''
+        config.headers.Token = isNotEmpty(getToken()) ? getToken() : ''
+        config.headers.Username = isNotEmpty(getUsername()) ? getUsername() : ''
         return config
     },
     (error) => {
