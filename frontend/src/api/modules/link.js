@@ -1,22 +1,23 @@
 import apiClient from '@/api/axios'
+const urlPrefix = '/admin/remote'
 export default {
   queryPage(data) {
     return apiClient({
-      url: '/page',
+      url: urlPrefix + '/link/page',
       method: 'get',
       params: data
     })
   },
   addSmallLink(data) {
     return apiClient({
-      url: '/create',
+      url: urlPrefix + '/link/create',
       method: 'post',
       data
     })
   },
   editSmallLink(data) {
     return apiClient({
-      url: '/update',
+      url: urlPrefix + '/link/update',
       method: 'post',
       data
     })
@@ -24,15 +25,15 @@ export default {
   // 通过链接查询标题
   queryTitle(data) {
     return apiClient({
+      url: urlPrefix + '/link/title',
       method: 'get',
-      url: '/title',
       params: data
     })
   },
   // 移动到回收站
   toRecycleBin(data) {
     return apiClient({
-      url: '/recycle-bin/save',
+      url: urlPrefix + '/recycleBin/save',
       method: 'post',
       data
     })
@@ -40,7 +41,7 @@ export default {
   // 查询回收站数据
   queryRecycleBin(data) {
     return apiClient({
-      url: '/recycle-bin/page',
+      url: urlPrefix + '/recycleBin/page',
       method: 'get',
       params: data
     })
@@ -48,23 +49,23 @@ export default {
   // 恢复短链接
   recoverLink(data) {
     return apiClient({
+      url: urlPrefix + '/recycleBin/recover',
       method: 'post',
-      url: '/recycle-bin/recover',
       data
     }) 
   },
   removeLink(data) {
     return apiClient({
+      url: urlPrefix + '/recycleBin/remove',
       method: 'post',
-      url: '/recycle-bin/remove',
       data
     })
   },
   queryLinkStats(data) {
     return apiClient({
+      url: urlPrefix + '/link/stats',
       method: 'get',
       params: data,
-      url: 'stats'
     })
   }
 }
