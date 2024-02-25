@@ -90,13 +90,13 @@
 						localStorage.setItem('username', loginForm.username)
 					}
 					ElMessage.success('登录成功！')
-					// router.push('/home')
+					router.push('/home')
 				} else if (res.data.message === 'User HAS ALREADY LOGGED IN') {
 					const cookiesUsername = getUsername()
 					if (cookiesUsername === loginForm.username) {
 						ElMessage.success('登录成功！')
 						console.log('登录成功！')
-						// router.push('/home')
+						router.push('/home')
 					} else {
 						ElMessage.warning('用户已在别处登录，请勿重复登录！')
 					}

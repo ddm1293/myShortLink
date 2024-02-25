@@ -14,7 +14,13 @@ const mySpaceStore = {
       selectedIndex: 0,
       totalNums: 0,
       tableData: [],
-      nums: 0
+      nums: 0,
+      isRecycleBin: false,
+      isEditGroup: false,
+      editGroup: {
+        gid: null,
+        groupName: ''
+      }
     }
   },
   mutations: {
@@ -35,7 +41,27 @@ const mySpaceStore = {
     },
     updatePageParamsGID (state, gid) {
       state.pageParams.gid = gid
-    }
+    },
+    updatePageParams (state, payload) {
+      Object.keys(payload).forEach(key => {
+        if (key in state.pageParams) {
+          state.pageParams[key] = payload[key];
+        }
+      })
+    },
+    setSelectedIndex (state, index) {
+      state.selectedIndex = index
+    },
+    setIsRecycleBin (state, changedTo) {
+      state.isRecycleBin = changedTo
+    },
+    setIsEditGroup (state, changedTo) {
+      state.isEditGroup = changedTo
+    },
+    setEditGroup (state, group) {
+      state.editGroup.gid = group.gid
+      state.editGroup.groupName = group.groupName
+    },
   },
   actions: {
     async addGroup({ dispatch }, { groupName }) {
@@ -71,6 +97,19 @@ const mySpaceStore = {
         } else {
           throw new Error(res.data.message);
         }
+      }
+    },
+    async refreshPage({ dispatch }) {
+      await dispatch('getGroupInfo')
+      await dispatch('queryPage') 
+    },
+    async deleteGroup({ state, commit, dispatch }, gid) {
+      const res = await API.group.deleteGroup({ gid })
+      if (res?.data.success) {
+        commit('setSelectedIndex', 0)
+        await dispatch('refreshPage')
+      } else {
+        throw new Error(res.data.message)
       }
     }
   }
