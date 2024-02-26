@@ -1,15 +1,13 @@
 <template>
   <div class="my-space-container">
-    <LinkGroup />
-    <!-- <ContentBox /> -->
+    <LinkGroupSidebar />
+    <ContentBox />
   </div>
 </template>
 
 <script setup>
-import LinkGroup from './components/LinkGroup.vue';
+import LinkGroupSidebar from './components/LinkGroupSidebar.vue';
 import ContentBox from './components/ContentBox.vue'
-import { ref, reactive, provide, getCurrentInstance } from 'vue'
-const { proxy } = getCurrentInstance()
 
 </script>
 

@@ -17,10 +17,14 @@ const mySpaceStore = {
       nums: 0,
       isRecycleBin: false,
       isEditGroup: false,
+      isAddSmallLink: false,
+      isAddSmallLinks: false,
       editGroup: {
         gid: null,
         groupName: ''
-      }
+      },
+      recycleBinNums: 0,
+      orderIndex: 0,
     }
   },
   mutations: {
@@ -62,6 +66,18 @@ const mySpaceStore = {
       state.editGroup.gid = group.gid
       state.editGroup.groupName = group.groupName
     },
+    setRecycleBinNums (state, num) {
+      state.recycleBinNums = num
+    },
+    setIsAddSmallLink (state, changedTo) {
+      state.isAddSmallLink = changedTo
+    },
+    setIsAddSmallLinks (state, changedTo) {
+      state.isAddSmallLinks = changedTo
+    },
+    setOrderIndex (state, changedTo) {
+      state.orderIndex = changedTo
+    }
   },
   actions: {
     async addGroup({ dispatch }, { groupName }) {
@@ -103,7 +119,7 @@ const mySpaceStore = {
       await dispatch('getGroupInfo')
       await dispatch('queryPage') 
     },
-    async deleteGroup({ state, commit, dispatch }, gid) {
+    async deleteGroup({ commit, dispatch }, gid) {
       const res = await API.group.deleteGroup({ gid })
       if (res?.data.success) {
         commit('setSelectedIndex', 0)
@@ -111,7 +127,13 @@ const mySpaceStore = {
       } else {
         throw new Error(res.data.message)
       }
-    }
+    },
+    async sortGroup(state, formData) {
+      const res = await API.group.sortGroup(formData)
+      if (!res?.data.success) {
+        throw new Error(res.data.message)
+      }
+    },
   }
 }
 
