@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
         try {
             String userJson = om.writeValueAsString(matchedUser);
             stringRedisTemplate.opsForHash().put("login_" + reqBody.getUsername(), uuid, userJson);
-            stringRedisTemplate.expire("login_" + reqBody.getUsername(), 30L, TimeUnit.DAYS);
+            stringRedisTemplate.expire("login_" + reqBody.getUsername(), 30L, TimeUnit.MINUTES);
         } catch (JsonProcessingException e) {
             log.error("Error Parsing User:", e);
             throw new ClientException(BaseErrorCode.USER_JSON_PARSE_ERROR);

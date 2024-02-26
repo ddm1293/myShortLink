@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
+import org.myShortLink.admin.remote.dto.req.ShortLinkCreateReqDTO;
+import org.myShortLink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.myShortLink.admin.remote.service.ShortLinkRemoteService;
 import org.myShortLink.admin.remote.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.admin.remote.dto.resp.OriginalLinkInfoRespDTO;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.openfeign.support.PageJacksonModule;
 import org.springframework.cloud.openfeign.support.SortJacksonModule;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -88,6 +91,29 @@ public class ShortLinkRemoteServiceImpl implements ShortLinkRemoteService {
         try {
             return new ObjectMapper()
                     .readValue(response, new TypeReference<Result<OriginalLinkInfoRespDTO>>() {})
+                    .getData();
+        } catch (JsonProcessingException e) {
+            log.error("see JsonProcessingException", e);
+            // TODO new error code
+            throw new ServiceException("Error when deserializing Json");
+        }
+    }
+
+    @Override
+    public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO reqBody) {
+        String response = webClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/link/create")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(reqBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        try {
+            return new ObjectMapper()
+                    .readValue(response, new TypeReference<Result<ShortLinkCreateRespDTO>>() {})
                     .getData();
         } catch (JsonProcessingException e) {
             log.error("see JsonProcessingException", e);

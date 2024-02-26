@@ -1,7 +1,9 @@
 package org.myShortLink.admin.remote.service;
 
+import org.myShortLink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.myShortLink.admin.remote.dto.resp.GroupCountQueryRespDTO;
 import org.myShortLink.admin.remote.dto.resp.OriginalLinkInfoRespDTO;
+import org.myShortLink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.myShortLink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.springframework.data.domain.Page;
 
@@ -14,4 +16,6 @@ public interface ShortLinkRemoteService {
     List<GroupCountQueryRespDTO> groupCount(List<String> gidList);
 
     OriginalLinkInfoRespDTO getOriginalLinkInfo(String link);
+
+    ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO reqBody);
 }
