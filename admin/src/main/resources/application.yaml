@@ -4,6 +4,8 @@ server:
     include-message: always
 
 spring:
+  application:
+    name: myShortLink-admin
   security:
     user:
       name: admin

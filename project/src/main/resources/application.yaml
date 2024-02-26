@@ -4,6 +4,8 @@ server:
     include-message: always
 
 spring:
+  application:
+    name: myShortLink-project
   data:
     redis:
       host: 127.0.0.1
